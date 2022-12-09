@@ -96,9 +96,13 @@ class _EventScraper:
         return fighter_url
     
     def _get_fighter_obj(self, fighter_url: str) -> Fighter:
-        fighter_scraper = _FighterScraper(fighter_url)
-
-        return fighter_scraper._scrape_fighter()
+        try:
+            fighter_scraper = _FighterScraper(fighter_url)
+            fighter = fighter_scraper._scrape_fighter()
+        except requests.exceptions.HTTPError:
+            fighter = None
+            
+        return fighter
 
     def _get_fighters_stats(self, fighter: dict) -> FighterStats:
         fighter_url = self._get_fighter_url(fighter)

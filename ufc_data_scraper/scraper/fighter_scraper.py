@@ -509,8 +509,7 @@ class _FighterScraper:
 
         url_response = requests.get(self._fighter_url)
 
-        if url_response.status_code != 200:
-            return None
+        url_response.raise_for_status()
 
         self._soup = BeautifulSoup(url_response.content, "html.parser")
 
