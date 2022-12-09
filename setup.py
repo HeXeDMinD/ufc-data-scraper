@@ -16,6 +16,7 @@ setuptools.setup(
         "Bug Tracker": "https://gitlab.com/HeXeDMinD/ufc-data-scraper/issues"
     },
     license="MIT",
-    packages=["ufc_data_scraper"],
+    package_dir = {"ufc_data_scraper": "ufc_data_scraper"},
+    # packages=["ufc_data_scraper"],
     install_requires=["requests", "bs4", "pytz", "unidecode"],
 )
