@@ -47,11 +47,11 @@ or convert that Event object into a dictionary.
  - **home_country** *- (str)* Country the fighter was born in.
  - **gym** *- (str)* Gym the fighter currently trains at.
  - **fighting_style** *- (str)* Name that best describes a fighters style. i.e "Boxing"
- - [**record** *- (Record object)*](#Record%20Object)
- - **win_method** *- (WinMethod object)* 
- - **physical_stats** *- (PhysicalStats object)* 
- - **striking** *- (Striking object)* 
- - **grappling** *- (Grappling object)* 
+ - **record** *- (Record object)* [Record object](#record-object)
+ - **win_method** *- (WinMethod object)* [WinMethod object](#winmethod-object)
+ - **physical_stats** *- (PhysicalStats object)* [PhysicalStats object](#physicalstats-object)
+ - **striking** *- (Striking object)* [Striking object](#striking-object)
+ - **grappling** *- (Grappling object)* [Grappling object](#grappling-object)
 
 ### Record Object
  - **win** *- (int)* Career wins.
@@ -69,10 +69,10 @@ or convert that Event object into a dictionary.
 
 ### PhysicalStats Object
  - **age** *- (int)* Current age.
- - **height** *- (int)* Height in inches.
- - **weight** *- (int)* Last weight in weight in pounds. i.e "205.50"
- - **reach** *- (int)* Reach in inches.
- - **leg_reach** *- (int)* Leg reach in inches.
+ - **height** *- (float)* Height in inches.
+ - **weight** *- (float)* Last weight in weight in pounds. i.e "205.50"
+ - **reach** *- (float)* Reach in inches.
+ - **leg_reach** *- (float)* Leg reach in inches.
 
 ### Striking Object
  - **striking_accuracy** *- (int)* Career striking accuracy as a percentage.
@@ -82,8 +82,8 @@ or convert that Event object into a dictionary.
  - **strikes_absorbed_average** *- (float)* Average strikes absorbed per 15 minutes.
  - **striking_defence** *- (int)* Percentage of strikes attempted against fighter that do not land.
  - **knockdown_average** *- (float)* Average knockdowns per 15 minutes.
- - **strike_position** *- (StrikePosition object)* 
- - **strike_target** *- (StrikeTarget object)*
+ - **strike_position** *- (StrikePosition object)* [StrikePosition object](#strikeposition-object)
+ - **strike_target** *- (StrikeTarget object)* [StrikeTarget object](#striketarget-object)
  
 #### StrikePosition Object
  - **standing** *- (int)* Strikes from standing position.

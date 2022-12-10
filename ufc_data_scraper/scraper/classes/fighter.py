@@ -22,11 +22,11 @@ class WinMethod:
     def __init__(
         self,
         knockout: int,
-        knockout_per: str,
+        knockout_per: int,
         decision: int,
-        decision_per: str,
+        decision_per: int,
         submission: int,
-        submission_per: str,
+        submission_per: int,
         average_fight_time: str,
     ) -> None:
 
@@ -46,10 +46,10 @@ class PhysicalStats:
     def __init__(
         self,
         age: int,
-        height: int,
-        weight: int,
-        reach: int,
-        leg_reach: int,
+        height: float,
+        weight: float,
+        reach: float,
+        leg_reach: float,
     ) -> None:
 
         self.age = age
@@ -68,11 +68,11 @@ class StrikePosition:
     def __init__(
         self,
         standing: int,
-        standing_per: str,
+        standing_per: int,
         clinch: int,
-        clinch_per: str,
+        clinch_per: int,
         ground: int,
-        ground_per: str,
+        ground_per: int,
     ) -> None:
 
         self.standing = standing
@@ -112,10 +112,10 @@ class Striking:
         striking_accuracy: int,
         strikes_landed: int,
         strikes_attempted: int,
-        strikes_average: int,
-        strikes_absorbed_average: int,
+        strikes_average: float,
+        strikes_absorbed_average: float,
         striking_defence: int,
-        knockdown_average: int,
+        knockdown_average: float,
         strike_position: StrikePosition,
         strike_target: StrikeTarget,
     ) -> None:
@@ -154,9 +154,9 @@ class Grappling:
         takedown_accuracy: int,
         takedowns_landed: int,
         takedowns_attempted: int,
-        takedowns_average: int,
+        takedowns_average: float,
         takedown_defence: int,
-        submission_average: int,
+        submission_average: float,
     ) -> None:
 
         self.takedown_accuracy = takedown_accuracy

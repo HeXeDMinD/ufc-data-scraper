@@ -193,7 +193,7 @@ class _FighterScraper:
             text = target.get_text().strip().split()[0]
             win, loss, draw = text.split("-")
 
-        record = {"win": win, "loss": loss, "draw": draw}
+        record = {"win": int(win), "loss": int(loss), "draw": int(draw)}
 
         return Record(**record)
 
@@ -251,11 +251,11 @@ class _FighterScraper:
 
         field_names = ["Age", "Height", "Weight", "Reach", "Leg reach"]
         physical_stats = {
-            "age": None,
-            "height": None,
-            "weight": None,
-            "reach": None,
-            "leg_reach": None,
+            "age": 0,
+            "height": 0,
+            "weight": 0,
+            "reach": 0,
+            "leg_reach": 0,
         }
         keys = list(physical_stats.keys())
 
@@ -264,10 +264,13 @@ class _FighterScraper:
             label = target.find("div", class_="c-bio__label").get_text()
             for i, name in enumerate(field_names):
                 if label == name:
-                    physical_stats[keys[i]] = (
-                        target.find("div", class_="c-bio__text").get_text().strip()
-                    )
-
+                    field_value = target.find("div", class_="c-bio__text").get_text().strip()
+                    if field_value:
+                        if name != "Age":
+                            physical_stats[keys[i]] = float(field_value)
+                        else:
+                            physical_stats[keys[i]] = int(field_value)
+        
         return PhysicalStats(**physical_stats)
 
     def _get_strike_position_obj(self, stats_section: ResultSet) -> StrikePosition:
@@ -318,8 +321,8 @@ class _FighterScraper:
                         value_per = field.get_text().replace("%", "").strip()
                     elif f"{name}_value" in field_id:
                         value = field.get_text().strip()
-                strike_target_stats[name] = value
-                strike_target_stats[f"{name}_per"] = value_per
+                strike_target_stats[name] = int(value)
+                strike_target_stats[f"{name}_per"] = int(value_per)
 
         return StrikeTarget(**strike_target_stats)
 
@@ -349,10 +352,10 @@ class _FighterScraper:
         striking_results = self._parse_result_set(stats_targets, dict_keys)
 
         striking_stats_block2 = {
-            "strikes_average": striking_results["Sig. Str. Landed"],
-            "strikes_absorbed_average": striking_results["Sig. Str. Absorbed"],
-            "striking_defence": striking_results["Sig. Str. Defense"],
-            "knockdown_average": striking_results["Knockdown Avg"],
+            "strikes_average": float(striking_results["Sig. Str. Landed"]),
+            "strikes_absorbed_average": float(striking_results["Sig. Str. Absorbed"]),
+            "striking_defence": int(striking_results["Sig. Str. Defense"]),
+            "knockdown_average": float(striking_results["Knockdown Avg"]),
         }
 
         striking_stats = striking_stats_block1 | striking_stats_block2
@@ -395,9 +398,9 @@ class _FighterScraper:
         dict_keys = ["Takedown avg", "Takedown Defense", "Submission avg"]
         grappling_results = self._parse_result_set(stats_targets, dict_keys)
         grappling_stats_block2 = {
-            "takedowns_average": grappling_results["Takedown avg"],
-            "takedown_defence": grappling_results["Takedown Defense"],
-            "submission_average": grappling_results["Submission avg"],
+            "takedowns_average": float(grappling_results["Takedown avg"]),
+            "takedown_defence": int(grappling_results["Takedown Defense"]),
+            "submission_average": float(grappling_results["Submission avg"]),
         }
 
         grappling_stats = grappling_stats_block1 | grappling_stats_block2
@@ -416,7 +419,7 @@ class _FighterScraper:
         acc_target = target.find("title")
         if acc_target:
             try:
-                accuracy = acc_target.get_text().split()[-1].replace("%", "").strip()
+                accuracy = int(acc_target.get_text().split()[-1].replace("%", "").strip())
             except IndexError:
                 pass
 
@@ -425,16 +428,17 @@ class _FighterScraper:
             try:
                 landed_target = targets[0].get_text().strip()
                 if landed_target != "":
-                    landed = landed_target
+                    landed = int(landed_target)
             except IndexError:
                 pass
 
             try:
                 attempted_target = targets[1].get_text().strip()
                 if attempted_target != "":
-                    attempted = attempted_target
+                    attempted = int(attempted_target)
             except IndexError:
                 pass
+            
         return (accuracy, landed, attempted)
 
     def _parse_stats_section(self, target: element.Tag) -> dict:
@@ -465,8 +469,8 @@ class _FighterScraper:
                     tag.find("div", class_="c-stat-3bar__value").get_text().split("(")
                 )
                 try:
-                    value = text_split[0].strip()
-                    value_per = (
+                    value = int(text_split[0].strip())
+                    value_per = int(
                         re.search(r"([0-9]+)", text_split[1].strip())
                         .group()
                         .replace("%", "")
@@ -489,6 +493,7 @@ class _FighterScraper:
 
                 if not label:
                     break
+                
                 label = label.get_text().strip()
                 for key in dict_keys:
                     if label == key:
