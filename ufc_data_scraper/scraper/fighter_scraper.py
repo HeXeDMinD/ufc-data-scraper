@@ -24,7 +24,7 @@ class _FighterScraper:
                 fighter_url = fighter_url.replace(banned_char, "")
 
         try:
-            fighter_url = incorrect_urls[fighter_url.lower()].lower()
+            fighter_url = incorrect_urls[fighter_url].lower()
         except KeyError:
             fighter_url = fighter_url.lower()
 
@@ -152,7 +152,7 @@ class _FighterScraper:
             str: gym
         """
 
-        gym = None
+        gym = "Not Listed"
 
         targets = self._soup.find_all("div", class_="c-bio__field")
         for target in targets:

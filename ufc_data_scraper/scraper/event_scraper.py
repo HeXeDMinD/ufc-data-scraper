@@ -92,7 +92,7 @@ class _EventScraper:
         if not fighter_url:
             fighter_name = self._get_fighter_name(fighter)
             fighter_url = f"https://www.ufc.com/athlete/{fighter_name.replace(' ', '-')}"
-            
+        
         return fighter_url
     
     def _get_fighter_obj(self, fighter_url: str) -> Fighter:
@@ -108,10 +108,10 @@ class _EventScraper:
         fighter_url = self._get_fighter_url(fighter)
         
         fighter_stats_data = {
-            "fighter": self._get_fighter_obj(fighter_url),
+            "fighter": self._get_fighter_obj(fighter_url) or fighter_url,
             "corner": fighter.get("Corner"),
             "weigh_in": fighter.get("WeighIn"),
-            "outcome": fighter.get("Outcome").get("Outcome"),
+            "outcome": fighter.get("Outcome").get("Outcome") or "TBD",
             "ko_of_the_night": fighter.get("KOOfTheNight"),
             "submission_of_the_night": fighter.get("SubmissionOfTheNight"),
             "performance_of_the_night": fighter.get("PerformanceOfTheNight"),
@@ -229,7 +229,7 @@ class _EventScraper:
     def _get_card_segments(self) -> list:
         # TODO - Documentation
         fight_card = self._event_data.get("FightCard")
-
+    
         card_segments = {}
         for fight in fight_card:
             segment_name = fight.get("CardSegment")
@@ -240,7 +240,7 @@ class _EventScraper:
                 card_segments[segment_name].fights.append(parsed_fight)
             else:
                 card_segments[segment_name] = CardSegment(
-                    segment_name, start_time, broadcaster, fights=[parsed_fight]
+                    segment_name, self._convert_date(start_time), broadcaster, fights=[parsed_fight]
                 )
 
         return card_segments.values()

@@ -7,7 +7,6 @@ from ufc_data_scraper.scraper.classes.fighter import Fighter
 
 class Location:
     def __init__(self, venue: str, city: str, country: str, tricode: str) -> None:
-
         self.venue = venue
         self.city = city
         self.country = country
@@ -18,6 +17,7 @@ class Location:
     
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
+
 
 class Result:
     def __init__(
@@ -52,6 +52,7 @@ class Result:
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
 
+
 class WeightClass:
     def __init__(self, description: str, abbreviation: str, weight: str) -> None:
         self.description = description
@@ -63,7 +64,8 @@ class WeightClass:
 
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
-    
+
+
 class Accolade:
     def __init__(self, description: str, type: str) -> None:
         self.description = description
@@ -75,6 +77,7 @@ class Accolade:
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
 
+
 class RuleSet:
     def __init__(self, description: str, possible_rounds: str) -> None:
         self.description = description
@@ -85,6 +88,7 @@ class RuleSet:
     
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
+
 
 class FightScore:
     def __init__(self, judge_name: str, score_red: int, score_blue: int) -> None:
@@ -98,12 +102,13 @@ class FightScore:
     def to_dict(self) -> dict:
         return json.dumps(self.__dict__)
 
+
 class FighterStats:
     def __init__(
         self,
         fighter: Fighter,
         corner: str,
-        weigh_in: int,
+        weigh_in: float,
         outcome: str,
         ko_of_the_night: bool,
         submission_of_the_night: bool,
@@ -123,10 +128,10 @@ class FighterStats:
         return self.fighter.name
     
     def to_dict(self) -> dict:
-        if self.fighter:
+        if type(self.fighter) != str:
             fighter = self.fighter.to_dict()
         else:
-            fighter = None
+            fighter = self.fighter
             
         fighter_stats_dict = {
             "fighter": fighter,
@@ -139,6 +144,7 @@ class FighterStats:
         }
         
         return fighter_stats_dict
+
 
 class Fight:
     def __init__(
@@ -188,7 +194,7 @@ class Fight:
             "referee_name": self.referee_name,
             
             "fighter_stats": [fighter_stats.to_dict() for fighter_stats in self.fighters_stats],
-            "result": self.result,
+            "result": self.result.to_dict(),
             "weight_class": self.weight_class.to_dict(),
             "accolades": accolade,
             "rule_set": self.rule_set.to_dict(),
@@ -197,6 +203,7 @@ class Fight:
         }
         
         return fight_dict
+
 
 class CardSegment:
     def __init__(
@@ -221,6 +228,7 @@ class CardSegment:
         }
         
         return segment_dict
+
 
 class Event:
     def __init__(
