@@ -4,18 +4,32 @@ import re
 from bs4 import BeautifulSoup, element, ResultSet
 from unidecode import unidecode
 
-from ufc_data_scraper.scraper.incorrect_fighter_urls import incorrect_urls
 from ufc_data_scraper.custom_objects.fighter import *
 
 
 class _FighterScraper:
     def __init__(self, fighter_url: str) -> None:
         """Scrapes a fighter page from ufc.com"""
-
-        self._fighter_url = self._set_fighter_url(fighter_url)
         self._soup = None
-
+        
+        self._incorrect_urls = self._get_incorrect_urls()
+        
+        self._fighter_url = self._set_fighter_url(fighter_url)
+        
+    def _get_incorrect_urls(self):
+        google_web_app = f"https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
+        
+        site_response = requests.get(google_web_app)
+        
+        if site_response.status_code != 200:
+            return None
+        
+        return {incorrect.lower(): correct.lower() for incorrect, correct in site_response.json().items()}
+    
     def _set_fighter_url(self, fighter_url: str) -> str:
+        fighter_url = fighter_url.lower()
+        incorrect_urls = self._get_incorrect_urls()
+
         fighter_url = fighter_url.replace("https", "http")
         
         banned_url_chars = ["--", "'"]
@@ -24,9 +38,9 @@ class _FighterScraper:
                 fighter_url = fighter_url.replace(banned_char, "")
 
         try:
-            fighter_url = incorrect_urls[fighter_url].lower()
-        except KeyError:
-            fighter_url = fighter_url.lower()
+            fighter_url = incorrect_urls[fighter_url]
+        except (KeyError, TypeError):
+            fighter_url = fighter_url
 
         return fighter_url
     
