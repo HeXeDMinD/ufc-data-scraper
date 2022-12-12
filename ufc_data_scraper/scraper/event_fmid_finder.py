@@ -1,10 +1,12 @@
 import json
 import requests
-import re
 import pytz
 
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime, timedelta
+
+from ufc_data_scraper.scraper.utils import _convert_date
+
 
 class _FmidFinder():
     def __init__(self, event_url: str) -> None:
@@ -12,10 +14,10 @@ class _FmidFinder():
 
         self._event_url = event_url
 
-    def __page_is_valid(self, soup: BeautifulSoup) -> bool:
+    def _page_is_valid(self, soup: BeautifulSoup) -> bool:
         """Checks if page is empty"""
-
-        return soup.find("h3")
+        
+        return soup.find("h3") and True or False
     
     def _get_event_urls(self, page_num: int) -> None:
         """Queries events with page_num and adds event urls to list.
@@ -38,7 +40,7 @@ class _FmidFinder():
             site_response.text, "html.parser", parse_only=only_headlines
         )
 
-        if not self.__page_is_valid(soup):
+        if not self._page_is_valid(soup):
             return
 
         headlines = list(soup)
@@ -87,8 +89,26 @@ class _FmidFinder():
         response_date = requests.get(events_endpoint)
 
         return response_date.json().get("LiveEventDetail")
+
+    def _get_event_date(self, soup: BeautifulSoup) -> str:
+        """Returns event date.
+
+        Returns:
+            str: date_time_obj.strftime("%Y %b %d")
+        """
+
+        event_start = None
+
+        target = soup.select(
+            "#block-mainpagecontent > div > div.c-hero > div.c-hero__container > div > div.c-hero__bottom-text > div.c-hero__headline-suffix.tz-change-inner"
+        )
+
+        if len(target) > 0:
+            event_start = target[0].get_text().strip()
+
+        return event_start
     
-    def _convert_date(self, date: str) -> str:
+    def _convert_scraped_date(self, date: str) -> str:
         """Converts scraped event date into usable format.
 
         Returns:
@@ -116,64 +136,6 @@ class _FmidFinder():
 
         return date_time_obj
 
-    def _get_event_date(self, soup: BeautifulSoup) -> str:
-        """Returns event date.
-
-        Returns:
-            str: date_time_obj.strftime("%Y %b %d")
-        """
-
-        event_start = None
-
-        target = soup.select(
-            "#block-mainpagecontent > div > div.c-hero > div.c-hero__container > div > div.c-hero__bottom-text > div.c-hero__headline-suffix.tz-change-inner"
-        )
-
-        if len(target) > 0:
-            date = target[0].get_text().strip()
-            event_start = self._convert_date(date)
-
-        return event_start
-
-    def _start_time_to_date(self, start_time: str, timezone: str):
-        """Converts API response date into usable format.
-
-        Returns:
-            str: date_time_obj.strftime("%Y %b %d")
-        """
-
-        date_obj = None
-
-        if start_time:
-            date_obj = datetime.strptime(start_time, "%Y-%m-%dT%H:%MZ")
-
-            if timezone:
-                match = re.match(r"^[A-Z]+(.)(.+)", timezone)
-                if match:
-                    op = match.groups()[0]
-                    t = datetime.strptime(match.groups()[1], "%H:%M").time()
-                    delta = timedelta(
-                        hours=t.hour,
-                        minutes=t.minute,
-                        seconds=t.second,
-                        microseconds=t.microsecond,
-                    )
-            else:
-                op = "-"
-                delta = timedelta(
-                    hours=1,
-                    minutes=0,
-                    seconds=0,
-                    microseconds=0,
-                )
-            if op == "-":
-                date_obj = date_obj + delta
-            else:
-                date_obj = date_obj - delta
-            date_obj = pytz.timezone("GMT").localize(date_obj)
-
-        return date_obj  # .strftime("%Y %b %d")
-
     def _scrape_event_fmid(self, event_url: str) -> int:
         """Gets event fmids from url, fmid can be used as API query."""
         
@@ -186,13 +148,13 @@ class _FmidFinder():
 
         site_scripts = json.loads(list(soup)[-1].text)
         try:
-            fmid = site_scripts["eventLiveStats"]["event_fmid"]
+            fmid = int(site_scripts["eventLiveStats"]["event_fmid"])
         except KeyError:
             fmid = None
 
         return fmid
     
-    def _find_event_fmid(self) -> int:
+    def _brute_force_event_fmid(self) -> int:
         current_fmid = self._get_last_fmid() - 10
 
         while True:
@@ -206,9 +168,11 @@ class _FmidFinder():
             site_response.raise_for_status()
 
             soup = BeautifulSoup(site_response.content, "html.parser")
+            
             scraped_date = self._get_event_date(soup)
+            scraped_date = self._convert_scraped_date(scraped_date)
             if scraped_date:
-                api_date = self._start_time_to_date(
+                api_date = _convert_date(
                     start_time=data["StartTime"], timezone=data["TimeZone"]
                 )
                 if scraped_date - api_date <= timedelta(days=2):
@@ -224,7 +188,7 @@ class _FmidFinder():
         If fmid is not present it saves the url instead.
         """
         
-        fmid = self._scrape_event_fmid(self._event_url) or self._find_event_fmid()
+        fmid = self._scrape_event_fmid(self._event_url) or self._brute_force_event_fmid()
         if not fmid:
             raise Exception(f"FMID could not be found for event url. {self._event_url}")
             

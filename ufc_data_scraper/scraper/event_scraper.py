@@ -1,11 +1,10 @@
 import requests
-import pytz
 
-from datetime import datetime
-
-from ufc_data_scraper.scraper.classes.event import *
-from ufc_data_scraper.scraper.classes.fighter import *
+from ufc_data_scraper.custom_objects.event import *
+from ufc_data_scraper.custom_objects.fighter import Fighter
 from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
+from ufc_data_scraper.scraper.utils import _convert_date
+
 
 class _EventScraper:
     def __init__(self, event_fmid: int) -> None:
@@ -21,22 +20,6 @@ class _EventScraper:
         event_response.raise_for_status()
 
         return event_response.json().get("LiveEventDetail")
-
-    def _convert_date(self, date: str) -> datetime:
-        """Localizes API response date to GMT.
-
-        Returns:
-            str: date_obj
-        """
-
-        date_obj = None
-
-        if date:
-            date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%MZ")
-
-            date_obj = pytz.timezone("GMT").localize(date_obj)
-
-        return date_obj
 
     def _get_location_obj(self) -> Location:
         # TODO - Documentation
@@ -126,7 +109,7 @@ class _EventScraper:
         
         return [self._get_fighters_stats(fighter) for fighter in fighters]
         
-    def _get_result(self, fight: dict) -> Result:
+    def _get_result_obj(self, fight: dict) -> Result:
         """Parses fight and returns result object."""
 
         fight_results = fight.get("Result")
@@ -205,7 +188,7 @@ class _EventScraper:
         referee_name = self._get_referee_name(fight)
 
         fighters_stats = self._parse_fighters(fight)
-        result = self._get_result(fight)
+        result_obj = self._get_result_obj(fight)
 
         weight_class_obj = self._get_weight_class_obj(fight)
         accolades_obj = self._get_accolades_obj(fight)
@@ -217,7 +200,7 @@ class _EventScraper:
             fight_order,
             referee_name,
             fighters_stats,
-            result,
+            result_obj,
             weight_class_obj,
             accolades_obj,
             rule_set_obj,
@@ -240,10 +223,10 @@ class _EventScraper:
                 card_segments[segment_name].fights.append(parsed_fight)
             else:
                 card_segments[segment_name] = CardSegment(
-                    segment_name, self._convert_date(start_time), broadcaster, fights=[parsed_fight]
+                    segment_name, _convert_date(start_time), broadcaster, fights=[parsed_fight]
                 )
 
-        return card_segments.values()
+        return list(card_segments.values())
     
     def _scrape_event(self) -> Event:
         # TODO - Documentation
@@ -253,7 +236,7 @@ class _EventScraper:
         event_info = {
             "fmid": self._event_fmid,
             "name": self._event_data.get("Name"),
-            "date": self._convert_date(event_date),
+            "date": _convert_date(event_date),
             "status": self._event_data.get("Status"),
             "location": self._get_location_obj(),
             "card_segments": self._get_card_segments()
