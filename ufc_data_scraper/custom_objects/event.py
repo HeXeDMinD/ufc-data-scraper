@@ -2,7 +2,7 @@ import json
 
 from datetime import datetime
 
-from ufc_data_scraper.scraper.classes.fighter import Fighter
+from ufc_data_scraper.custom_objects.fighter import Fighter
 
 
 class Location:

@@ -1,9 +1,9 @@
 from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
-from ufc_data_scraper.scraper.classes.fighter import Fighter
+from ufc_data_scraper.custom_objects.fighter import Fighter
 
 from ufc_data_scraper.scraper import event_fmid_finder
 from ufc_data_scraper.scraper.event_scraper import _EventScraper
-from ufc_data_scraper.scraper.classes.event import Event
+from ufc_data_scraper.custom_objects.event import Event
 
 def scrape_fighter_url(fighter_url: str) -> Fighter:
     """Scrapes fighter page.
