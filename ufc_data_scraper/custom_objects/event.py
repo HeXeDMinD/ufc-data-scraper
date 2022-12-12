@@ -1,7 +1,6 @@
-import json
-
 from datetime import datetime
 
+from ufc_data_scraper.custom_objects.base_object import _BaseObject
 from ufc_data_scraper.custom_objects.fighter import Fighter
 
 
@@ -14,9 +13,6 @@ class Location:
 
     def __str__(self) -> str:
         return f"{self.venue} - {self.city}, {self.country}"
-    
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class Result:
@@ -48,9 +44,6 @@ class Result:
 
     def __str__(self) -> str:
         return self.method
-    
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class WeightClass:
@@ -62,8 +55,6 @@ class WeightClass:
     def __str__(self) -> str:
         return self.description
 
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class Accolade:
@@ -73,9 +64,6 @@ class Accolade:
 
     def __str__(self) -> str:
         return self.description
-    
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class RuleSet:
@@ -85,9 +73,6 @@ class RuleSet:
 
     def __str__(self) -> str:
         return self.description
-    
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class FightScore:
@@ -98,9 +83,6 @@ class FightScore:
 
     def __str__(self) -> str:
         return f"{self.judge_name}: {self.score_red} - {self.score_blue}"
-    
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 
 class FighterStats:
@@ -126,25 +108,6 @@ class FighterStats:
 
     def __str__(self) -> str:
         return self.fighter.name
-    
-    def to_dict(self) -> dict:
-        if type(self.fighter) != str:
-            fighter = self.fighter.to_dict()
-        else:
-            fighter = self.fighter
-            
-        fighter_stats_dict = {
-            "fighter": fighter,
-            "corner": self.corner,
-            "weigh_in": self.weigh_in,
-            "outcome": self.outcome,
-            "ko_of_the_night": self.ko_of_the_night,
-            "submission_of_the_night": self.submission_of_the_night,
-            "performance_of_the_night": self.performance_of_the_night,
-        }
-        
-        return fighter_stats_dict
-
 
 class Fight:
     def __init__(
@@ -182,27 +145,6 @@ class Fight:
             fighter_2_name = "Missing Fighter"
             
         return f"{fighter_1_name} vs {fighter_2_name}"
-    
-    def to_dict(self) -> dict:
-        if self.accolades:
-            accolade = self.accolades.to_dict()
-        else:
-            accolade = None
-            
-        fight_dict = {
-            "fight_order": self.fight_order,
-            "referee_name": self.referee_name,
-            
-            "fighter_stats": [fighter_stats.to_dict() for fighter_stats in self.fighters_stats],
-            "result": self.result.to_dict(),
-            "weight_class": self.weight_class.to_dict(),
-            "accolades": accolade,
-            "rule_set": self.rule_set.to_dict(),
-            
-            "fight_scores": [fight_score.to_dict() or None for fight_score in self.fight_scores],
-        }
-        
-        return fight_dict
 
 
 class CardSegment:
@@ -218,19 +160,8 @@ class CardSegment:
     def __str__(self) -> str:
         return self.segment_name
 
-    def to_dict(self) -> dict:
-        segment_dict = {
-            "segment_name": self.segment_name,
-            "start_time": self.start_time,
-            "broadcaster": self.broadcaster,
 
-            "fights": [fight.to_dict() for fight in self.fights],
-        }
-        
-        return segment_dict
-
-
-class Event:
+class Event(_BaseObject):
     def __init__(
         self,
         fmid: int,
@@ -240,6 +171,8 @@ class Event:
         location: Location,
         card_segments: list,
     ) -> None:
+        
+        super().__init__()
         
         self.fmid = fmid
         self.name = name
@@ -251,16 +184,3 @@ class Event:
 
     def __str__(self) -> str:
         return self.name
-    
-    def to_dict(self) -> dict:
-        event_dict = {
-            "fmid": self.fmid,
-            "name": self.name,
-            "date": self.date,
-            "status": self.status,
-            
-            "location": self.location.to_dict(),
-            "card_segments": [card_segment.to_dict() for card_segment in self.card_segments],
-        }
-        
-        return event_dict

@@ -1,4 +1,4 @@
-import json
+from ufc_data_scraper.custom_objects.base_object import _BaseObject
 
 class Record:
     def __init__(
@@ -14,9 +14,6 @@ class Record:
 
     def __str__(self) -> str:
         return f"{self.win}-{self.loss}-{self.draw}"
-
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 class WinMethod:
     def __init__(
@@ -39,8 +36,6 @@ class WinMethod:
 
         self.average_fight_time = average_fight_time
         
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 class PhysicalStats:
     def __init__(
@@ -61,8 +56,6 @@ class PhysicalStats:
     def __str__(self) -> str:
         return f"{self.height}, {self.weight}"
     
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 class StrikePosition:
     def __init__(
@@ -82,8 +75,6 @@ class StrikePosition:
         self.ground = ground
         self.ground_per = ground_per
         
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 class StrikeTarget:
     def __init__(
@@ -103,8 +94,6 @@ class StrikeTarget:
         self.leg = leg
         self.leg_per = leg_per
         
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
 class Striking:
     def __init__(
@@ -132,21 +121,6 @@ class Striking:
         self.strike_position = strike_position
         self.strike_target = strike_target
         
-    def to_dict(self) -> dict:
-        striking_dict = {
-            "striking_accuracy": self.striking_accuracy,
-            "strikes_landed": self.strikes_landed,
-            "strikes_attempted": self.strikes_attempted,
-            "strikes_average": self.strikes_average,
-            "strikes_absorbed_average": self.strikes_absorbed_average,
-            "striking_defence": self.striking_defence,
-            
-            "knockdown_average": self.knockdown_average,
-            "strike_position": self.strike_position.to_dict(),
-            "strke_target": self.strike_target.to_dict(),
-        }
-        
-        return striking_dict
 
 class Grappling:
     def __init__(
@@ -169,10 +143,8 @@ class Grappling:
     def __str__(self) -> str:
         return self.takedown_accuracy
     
-    def to_dict(self) -> dict:
-        return json.dumps(self.__dict__)
 
-class Fighter:
+class Fighter(_BaseObject):
     def __init__(
         self,
         fighter_url: str,
@@ -193,6 +165,8 @@ class Fighter:
         grappling: Grappling,
     ) -> None:
 
+        super().__init__()
+        
         self.fighter_url = fighter_url
 
         self.name = name
@@ -218,24 +192,3 @@ class Fighter:
     def __str__(self) -> str:
         return self.name
     
-    def to_dict(self) -> dict:
-        fighter_dict = {
-            "fighter_url": self.fighter_url,
-            "name": self.name,
-            "nickname": self.nickname,
-            "status": self.status,
-            "ranking": self.ranking,
-            "pfp_ranking": self.pfp_ranking,
-            "weight_class": self.weight_class,
-            "home_city": self.home_city,
-            "home_country": self.home_country,
-            "gym": self.gym,
-            "fighting_style": self.fighting_style,
-            "record": self.record.to_dict(),
-            "win_method": self.win_method.to_dict(),
-            "physical_stats": self.physical_stats.to_dict(),
-            "striking": self.striking.to_dict(),
-            "grappling": self.grappling.to_dict(),
-        }
-        
-        return fighter_dict
