@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup, element, ResultSet
 from unidecode import unidecode
 
 from ufc_data_scraper.scraper.incorrect_fighter_urls import incorrect_urls
-from ufc_data_scraper.scraper.classes.fighter import *
+from ufc_data_scraper.custom_objects.fighter import *
 
 
 class _FighterScraper:
@@ -152,7 +152,7 @@ class _FighterScraper:
             str: gym
         """
 
-        gym = "Not Listed"
+        gym = "Unlisted"
 
         targets = self._soup.find_all("div", class_="c-bio__field")
         for target in targets:
@@ -170,7 +170,7 @@ class _FighterScraper:
             str: fighting_style
         """
 
-        fighting_style = None
+        fighting_style = "Unlisted"
 
         targets = self._soup.find_all("div", class_="c-bio__field")
         for target in targets:
