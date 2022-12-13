@@ -10,20 +10,34 @@ from ufc_data_scraper.scraper.utils import _convert_date
 
 class _FmidFinder():
     def __init__(self, event_url: str) -> None:
-        """Finds UFC event fmids and urls and adds them to a list."""
+        """Finds UFC event fmid from a UFC event page.
+
+        Args:
+            event_url (str): UFC event page.
+        """
 
         self._event_url = event_url
 
     def _page_is_valid(self, soup: BeautifulSoup) -> bool:
-        """Checks if page is empty"""
+        """Checks if page is empty.
+
+        Args:
+            soup (BeautifulSoup): BeautifulSoup object of page response.
+
+        Returns:
+            bool: Whether page is empty.
+        """
         
         return soup.find("h3") and True or False
     
-    def _get_event_urls(self, page_num: int) -> None:
+    def _get_event_urls(self, page_num: int) -> list:
         """Queries events with page_num and adds event urls to list.
 
         Args:
             page_num (int): Page number for query.
+
+        Returns:
+            list: List of event urls returned from query.
         """
         
         page_query = {"page": page_num}
@@ -56,7 +70,11 @@ class _FmidFinder():
         return event_urls
     
     def _get_last_fmid(self) -> int:
-        """Returns last available fmid from UFC events page."""
+        """Returns last available fmid from UFC events page.
+
+        Returns:
+            int: Latest FMID from queried event urls.
+        """
         
         last_fmid = None
 
@@ -77,7 +95,7 @@ class _FmidFinder():
         """Queries private API and returns json data in dict format.
 
         Args:
-            event_fmid (int): fmid to query
+            event_fmid (int): FMID to query.
 
         Returns:
             dict: Event data json in dict format
@@ -93,8 +111,12 @@ class _FmidFinder():
     def _get_event_date(self, soup: BeautifulSoup) -> str:
         """Returns event date.
 
+        Args:
+            soup (BeautifulSoup): BeautifulSoup object of page response.
+
         Returns:
-            str: date_time_obj.strftime("%Y %b %d")
+            str: Event date in simple string format or None if it cannot be scraped.
+            >>> "Sun, Dec 18 / 2:00 AM SAST"
         """
 
         event_start = None
@@ -108,11 +130,14 @@ class _FmidFinder():
 
         return event_start
     
-    def _convert_scraped_date(self, date: str) -> str:
+    def _convert_scraped_date(self, date: str) -> datetime:
         """Converts scraped event date into usable format.
 
+        Args:
+            date (str): Date in simple string format.
+            
         Returns:
-            str: date_time_obj.strftime("%Y %b %d")
+            datetime: Datetime object of supplied string, localized to GMT.
         """
         
         date_now = datetime.now()
@@ -137,7 +162,14 @@ class _FmidFinder():
         return date_time_obj
 
     def _scrape_event_fmid(self, event_url: str) -> int:
-        """Gets event fmids from url, fmid can be used as API query."""
+        """Gets event fmid from url, fmid can be used as API query.
+
+        Args:
+            event_url (str): Event url to scrape for event fmid.
+
+        Returns:
+            int: Event FMID, can be used as API query or None if it cannot be scraped.
+        """
         
         site_response = requests.get(event_url)
 
@@ -155,6 +187,12 @@ class _FmidFinder():
         return fmid
     
     def _brute_force_event_fmid(self) -> int:
+        """Attempt to brute force guess the event fmid if it is not available from the event url.
+
+        Returns:
+            int: Event FMID, can be used as API query or None if it cannot be acquired.
+        """
+        
         current_fmid = self._get_last_fmid() - 10
 
         while True:
@@ -185,7 +223,8 @@ class _FmidFinder():
     def _get_event_fmid(self) -> int:
         """Gets event fmids from url, fmid can be used as API query.
 
-        If fmid is not present it saves the url instead.
+        Returns:
+            int: Event FMID, can be used as API query.
         """
         
         fmid = self._scrape_event_fmid(self._event_url) or self._brute_force_event_fmid()
@@ -195,6 +234,12 @@ class _FmidFinder():
         return fmid
 
 def find_fmid(event_url: str) -> int:
+    """Gets event fmids from url, fmid can be used as API query.
+
+    Returns:
+        int: Event FMID, can be used as API query.
+    """
+        
     fmid_finder = _FmidFinder(event_url)
 
     return fmid_finder._get_event_fmid()

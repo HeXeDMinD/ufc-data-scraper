@@ -3,12 +3,15 @@ import pytz
 from datetime import datetime
 
 def _convert_date(date: str) -> datetime:
-    """Localizes API response date to GMT.
+    """Converts API response date into usable format.
 
+    Args:
+        date (str): Date in simple string format.
+        
     Returns:
-        str: date_obj
+        datetime: Datetime object of supplied string, localized to GMT.
     """
-
+    
     date_obj = None
 
     if date:

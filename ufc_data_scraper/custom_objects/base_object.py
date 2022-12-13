@@ -5,7 +5,13 @@ base_classes = [int, str, float, bool, datetime]
 
     
 class _BaseObject:
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """Returns object attributes as a dictionary.
+
+        Returns:
+            dict: Dictionary of objects attributes.
+        """
+        
         return self.__dump_object(self)
     
     def __dump_object(self, object):

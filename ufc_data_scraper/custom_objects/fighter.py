@@ -1,6 +1,6 @@
 from ufc_data_scraper.custom_objects.base_object import _BaseObject
 
-class Record:
+class Record(_BaseObject):
     def __init__(
         self,
         win: int,
@@ -15,7 +15,7 @@ class Record:
     def __str__(self) -> str:
         return f"{self.win}-{self.loss}-{self.draw}"
 
-class WinMethod:
+class WinMethod(_BaseObject):
     def __init__(
         self,
         knockout: int,
@@ -37,7 +37,7 @@ class WinMethod:
         self.average_fight_time = average_fight_time
         
 
-class PhysicalStats:
+class PhysicalStats(_BaseObject):
     def __init__(
         self,
         age: int,
@@ -57,7 +57,7 @@ class PhysicalStats:
         return f"{self.height}, {self.weight}"
     
 
-class StrikePosition:
+class StrikePosition(_BaseObject):
     def __init__(
         self,
         standing: int,
@@ -76,7 +76,7 @@ class StrikePosition:
         self.ground_per = ground_per
         
 
-class StrikeTarget:
+class StrikeTarget(_BaseObject):
     def __init__(
         self,
         head: int,
@@ -95,7 +95,7 @@ class StrikeTarget:
         self.leg_per = leg_per
         
 
-class Striking:
+class Striking(_BaseObject):
     def __init__(
         self,
         striking_accuracy: int,
@@ -122,7 +122,7 @@ class Striking:
         self.strike_target = strike_target
         
 
-class Grappling:
+class Grappling(_BaseObject):
     def __init__(
         self,
         takedown_accuracy: int,

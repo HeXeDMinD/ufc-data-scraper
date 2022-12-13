@@ -4,7 +4,7 @@ from ufc_data_scraper.custom_objects.base_object import _BaseObject
 from ufc_data_scraper.custom_objects.fighter import Fighter
 
 
-class Location:
+class Location(_BaseObject):
     def __init__(self, venue: str, city: str, country: str, tricode: str) -> None:
         self.venue = venue
         self.city = city
@@ -15,7 +15,7 @@ class Location:
         return f"{self.venue} - {self.city}, {self.country}"
 
 
-class Result:
+class Result(_BaseObject):
     def __init__(
         self,
         method: str,
@@ -46,7 +46,7 @@ class Result:
         return self.method
 
 
-class WeightClass:
+class WeightClass(_BaseObject):
     def __init__(self, description: str, abbreviation: str, weight: str) -> None:
         self.description = description
         self.abbreviation = abbreviation
@@ -56,8 +56,7 @@ class WeightClass:
         return self.description
 
 
-
-class Accolade:
+class Accolade(_BaseObject):
     def __init__(self, description: str, type: str) -> None:
         self.description = description
         self.type = type
@@ -66,7 +65,7 @@ class Accolade:
         return self.description
 
 
-class RuleSet:
+class RuleSet(_BaseObject):
     def __init__(self, description: str, possible_rounds: str) -> None:
         self.description = description
         self.possible_rounds = possible_rounds
@@ -75,7 +74,7 @@ class RuleSet:
         return self.description
 
 
-class FightScore:
+class FightScore(_BaseObject):
     def __init__(self, judge_name: str, score_red: int, score_blue: int) -> None:
         self.judge_name = judge_name
         self.score_red = score_red
@@ -85,7 +84,7 @@ class FightScore:
         return f"{self.judge_name}: {self.score_red} - {self.score_blue}"
 
 
-class FighterStats:
+class FighterStats(_BaseObject):
     def __init__(
         self,
         fighter: Fighter,
@@ -109,7 +108,7 @@ class FighterStats:
     def __str__(self) -> str:
         return self.fighter.name
 
-class Fight:
+class Fight(_BaseObject):
     def __init__(
         self,
         fight_order: int,
@@ -147,7 +146,7 @@ class Fight:
         return f"{fighter_1_name} vs {fighter_2_name}"
 
 
-class CardSegment:
+class CardSegment(_BaseObject):
     def __init__(
         self, segment_name: str, start_time: datetime, broadcaster: str, fights: list
     ) -> None:
