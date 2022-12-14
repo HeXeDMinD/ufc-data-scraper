@@ -127,7 +127,7 @@ class _FighterScraper:
         targets = self._soup.find_all("p", class_="hero-profile__tag")
         for target in targets:
             text = target.get_text().strip()
-            if "Interim" in text or "Champion" in text:
+            if "Interim" in text or "Champion" in text or "Title":
                 ranking = text
 
             match = re.match(r"^(#[0-9]+)", text)

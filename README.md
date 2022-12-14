@@ -56,7 +56,7 @@ or convert that Event or any other related object into a dictionary.
 
 Requests is currently only available from git:
 
-    $ python -m pip install git+git@gitlab.com:HeXeDMinD/ufc-data-scraper.git
+    $ python -m pip install git+https://gitlab.com/HeXeDMinD/ufc-data-scraper.git
 
 ## Fighter Object
 
