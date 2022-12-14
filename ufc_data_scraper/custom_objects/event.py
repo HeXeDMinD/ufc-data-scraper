@@ -108,6 +108,7 @@ class FighterStats(_BaseObject):
     def __str__(self) -> str:
         return self.fighter.name
 
+
 class Fight(_BaseObject):
     def __init__(
         self,
@@ -137,12 +138,12 @@ class Fight(_BaseObject):
             fighter_1_name = self.fighters_stats[0].fighter.name
         except AttributeError:
             fighter_1_name = "Missing Fighter"
-            
+
         try:
             fighter_2_name = self.fighters_stats[1].fighter.name
         except AttributeError:
             fighter_2_name = "Missing Fighter"
-            
+
         return f"{fighter_1_name} vs {fighter_2_name}"
 
 
@@ -170,9 +171,9 @@ class Event(_BaseObject):
         location: Location,
         card_segments: list,
     ) -> None:
-        
+
         super().__init__()
-        
+
         self.fmid = fmid
         self.name = name
         self.date = date

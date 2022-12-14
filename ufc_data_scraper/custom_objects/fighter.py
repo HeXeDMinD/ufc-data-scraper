@@ -1,5 +1,6 @@
 from ufc_data_scraper.custom_objects.base_object import _BaseObject
 
+
 class Record(_BaseObject):
     def __init__(
         self,
@@ -14,6 +15,7 @@ class Record(_BaseObject):
 
     def __str__(self) -> str:
         return f"{self.win}-{self.loss}-{self.draw}"
+
 
 class WinMethod(_BaseObject):
     def __init__(
@@ -35,7 +37,7 @@ class WinMethod(_BaseObject):
         self.submission_per = submission_per
 
         self.average_fight_time = average_fight_time
-        
+
 
 class PhysicalStats(_BaseObject):
     def __init__(
@@ -55,7 +57,7 @@ class PhysicalStats(_BaseObject):
 
     def __str__(self) -> str:
         return f"{self.height}, {self.weight}"
-    
+
 
 class StrikePosition(_BaseObject):
     def __init__(
@@ -74,7 +76,7 @@ class StrikePosition(_BaseObject):
         self.clinch_per = clinch_per
         self.ground = ground
         self.ground_per = ground_per
-        
+
 
 class StrikeTarget(_BaseObject):
     def __init__(
@@ -93,7 +95,7 @@ class StrikeTarget(_BaseObject):
         self.body_per = body_per
         self.leg = leg
         self.leg_per = leg_per
-        
+
 
 class Striking(_BaseObject):
     def __init__(
@@ -108,7 +110,7 @@ class Striking(_BaseObject):
         strike_position: StrikePosition,
         strike_target: StrikeTarget,
     ) -> None:
-        
+
         self.striking_accuracy = striking_accuracy
         self.strikes_landed = strikes_landed
         self.strikes_attempted = strikes_attempted
@@ -120,7 +122,7 @@ class Striking(_BaseObject):
 
         self.strike_position = strike_position
         self.strike_target = strike_target
-        
+
 
 class Grappling(_BaseObject):
     def __init__(
@@ -142,7 +144,7 @@ class Grappling(_BaseObject):
 
     def __str__(self) -> str:
         return self.takedown_accuracy
-    
+
 
 class Fighter(_BaseObject):
     def __init__(
@@ -166,7 +168,7 @@ class Fighter(_BaseObject):
     ) -> None:
 
         super().__init__()
-        
+
         self.fighter_url = fighter_url
 
         self.name = name
@@ -191,4 +193,3 @@ class Fighter(_BaseObject):
 
     def __str__(self) -> str:
         return self.name
-    

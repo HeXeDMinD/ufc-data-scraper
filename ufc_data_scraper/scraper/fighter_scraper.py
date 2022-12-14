@@ -13,31 +13,34 @@ class _FighterScraper:
 
         Args:
             fighter_url (url): UFC fighter page url.
-            
+
         >>> fighter_scraper = _FighterScraper(fighter_url)
         >>> fighter = fighter_scraper._scrape_fighter()
         """
-        
+
         self._soup = None
         self._incorrect_urls = self._get_incorrect_urls()
         self._fighter_url = self._set_fighter_url(fighter_url)
-        
+
     def _get_incorrect_urls(self) -> dict:
         """Queries a google web app for up to date list of incorrect fighter urls.
 
         Returns:
             dict: Dictionary of incorrect fighter urls with their correct counterpart.
         """
-        
+
         google_web_app = f"https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
-        
+
         site_response = requests.get(google_web_app)
-        
+
         if site_response.status_code != 200:
             return None
-        
-        return {incorrect.lower(): correct.lower() for incorrect, correct in site_response.json().items()}
-    
+
+        return {
+            incorrect.lower(): correct.lower()
+            for incorrect, correct in site_response.json().items()
+        }
+
     def _set_fighter_url(self, fighter_url: str) -> str:
         """Replaces incorrect urls and removes inconsistancies from url.
 
@@ -47,12 +50,12 @@ class _FighterScraper:
         Returns:
             str: Corrected fighter url.
         """
-        
+
         fighter_url = fighter_url.lower()
         incorrect_urls = self._get_incorrect_urls()
 
         fighter_url = fighter_url.replace("https", "http")
-        
+
         banned_url_chars = ["--", "'"]
         for banned_char in banned_url_chars:
             if banned_char in fighter_url:
@@ -64,7 +67,7 @@ class _FighterScraper:
             fighter_url = fighter_url
 
         return fighter_url
-    
+
     def _get_name(self) -> str:
         """Gets fighter name.
 
@@ -116,19 +119,22 @@ class _FighterScraper:
         return status
 
     def _get_ranking(self) -> tuple:
-        """Gets fighter's division and pound for pound ranking. Returns them as a tuple of int values.
+        """Gets fighter's division and pound for pound ranking. Returns them as a tuple of str values.
 
         Returns:
             tuple: (ranking, pfp_ranking)
         """
 
-        ranking, pfp_ranking = "Unranked", "Unranked"
+        ranking, pfp_ranking = "Unranked", "PFP Unranked"
+
+        champion_keywords = ("Interim", "Champion", "Title")
 
         targets = self._soup.find_all("p", class_="hero-profile__tag")
         for target in targets:
             text = target.get_text().strip()
-            if "Interim" in text or "Champion" in text or "Title":
-                ranking = text
+            for keyword in champion_keywords:
+                if keyword in text:
+                    ranking = text
 
             match = re.match(r"^(#[0-9]+)", text)
             if match:
@@ -265,14 +271,14 @@ class _FighterScraper:
 
     def _get_win_method_obj(self, stats_section: ResultSet) -> WinMethod:
         """Get win method information from ResultSet and return it as a WinMethod object.
-        
+
         Args:
             stats_section (ResultSet): ResultSet object containing fighters win method information.
-            
+
         Returns:
             WinMethod: WinMethod object containing fighter's win method information.
         """
-        
+
         average_fight_time = self._get_average_fight_time()
 
         try:
@@ -319,25 +325,27 @@ class _FighterScraper:
             label = target.find("div", class_="c-bio__label").get_text()
             for i, name in enumerate(field_names):
                 if label == name:
-                    field_value = target.find("div", class_="c-bio__text").get_text().strip()
+                    field_value = (
+                        target.find("div", class_="c-bio__text").get_text().strip()
+                    )
                     if field_value:
                         if name != "Age":
                             physical_stats[keys[i]] = float(field_value)
                         else:
                             physical_stats[keys[i]] = int(field_value)
-        
+
         return PhysicalStats(**physical_stats)
 
     def _get_strike_position_obj(self, stats_section: ResultSet) -> StrikePosition:
         """Get fighter's strike position information from ResultSet and return it as a StrikePosition object.
-        
+
         Args:
             stats_section (ResultSet): ResultSet object containing fighters strike position information.
-            
+
         Returns:
             StrikePosition: StrikePosition object containing fighter's strike position information.
         """
-        
+
         try:
             position_stats = self._parse_stats_section(stats_section)
             standing, standing_per = position_stats["standing"]
@@ -396,14 +404,14 @@ class _FighterScraper:
 
     def _get_striking_stats(self, stats_targets: ResultSet) -> dict:
         """Get fighter's striking information from ResultSet and return it as a dict.
-        
+
         Args:
             stats_targets (ResultSet): ResultSet object containing fighters striking and grappling information.
-            
+
         Returns:
             dict: Dictionary containing fighter's striking information.
         """
-        
+
         try:
             (
                 striking_accuracy,
@@ -453,7 +461,7 @@ class _FighterScraper:
         Returns:
             Striking: Striking object containing all of the fighter's striking, strike position and striking target information.
         """
-        
+
         stats = striking_stats | {
             "strike_position": strike_position,
             "strike_target": strike_target,
@@ -462,14 +470,14 @@ class _FighterScraper:
 
     def _get_grappling_obj(self, stats_targets: ResultSet) -> Grappling:
         """Get fighter's grappling information from ResultSet and return it as a Grappling object.
-        
+
         Args:
             stats_targets (ResultSet): ResultSet object containing fighters striking and grappling information.
-            
+
         Returns:
             Grappling: Grappling object containing fighter's grappling information.
         """
-        
+
         try:
             (
                 takedown_accuracy,
@@ -506,7 +514,7 @@ class _FighterScraper:
 
         Args:
             target (Tag): Tag containing desired stats.
-            
+
         Returns:
             tuple: (accuracy, landed, attempted)
         """
@@ -516,7 +524,9 @@ class _FighterScraper:
         acc_target = target.find("title")
         if acc_target:
             try:
-                accuracy = int(acc_target.get_text().split()[-1].replace("%", "").strip())
+                accuracy = int(
+                    acc_target.get_text().split()[-1].replace("%", "").strip()
+                )
             except IndexError:
                 pass
 
@@ -535,19 +545,19 @@ class _FighterScraper:
                     attempted = int(attempted_target)
             except IndexError:
                 pass
-            
+
         return (accuracy, landed, attempted)
 
     def _parse_stats_section(self, target: Tag) -> dict:
         """Parses stats section for strike position and win method information. Returns them as a dictionary.
-        
+
         Args:
             target (Tag): Tag containing desired information.
-            
+
         keys:
             StrikePosition: standing, clinch, ground
             WinMethod: ko/tko, dec, sub
-        
+
         Return
             dict: stats[key] = (value, value_per)
         """
@@ -601,7 +611,7 @@ class _FighterScraper:
 
                 if not label:
                     break
-                
+
                 label = label.get_text().strip()
                 for key in dict_keys:
                     if label == key:
@@ -622,7 +632,7 @@ class _FighterScraper:
         Returns:
             Fighter: Fighter object containing fighter's data.
         """
-        
+
         url_response = requests.get(self._fighter_url)
 
         url_response.raise_for_status()
