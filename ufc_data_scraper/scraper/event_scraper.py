@@ -357,11 +357,11 @@ class _EventScraper:
 
         return fight
 
-    def _get_card_segments(self) -> list:
-        """Parse each card segment in event data, convert each into a CardSegment objects and return them as a list.
+    def _get_card_segments(self) -> dict:
+        """Parse each card segment in event data, convert each into a CardSegment objects and return them as a dict.
 
         Returns:
-            list: List of CardSegment objects.
+            dict: Dictionary of card segements. segment_name: CardSegment
         """
 
         fight_card = self._event_data.get("FightCard")
@@ -382,7 +382,7 @@ class _EventScraper:
                     fights=[parsed_fight],
                 )
 
-        return list(card_segments.values())
+        return card_segments
 
     def _scrape_event(self) -> Event:
         """Queries private UFC api and returns query as an Event object.

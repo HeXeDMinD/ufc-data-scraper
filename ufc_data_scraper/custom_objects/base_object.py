@@ -29,8 +29,13 @@ class _BaseObject:
             object_list = []
             # If a list or tuple we run this function for each item and return a list.
             for item in object:
-                object_list.append(self.__get_value(item))
+                object_list.append(self.__dump_object(item))
             return object_list
+        elif object_type == dict:
+            object_dict = {}
+            for key, value in object.items():
+                object_dict[key] = self.__dump_object(value)
+            return object_dict
         else:  
             # If a custom object we start the process over
             return self.__dump_object(object)

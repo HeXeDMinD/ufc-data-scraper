@@ -169,7 +169,7 @@ class Event(_BaseObject):
         date: datetime,
         status: str,
         location: Location,
-        card_segments: list,
+        card_segments: dict,
     ) -> None:
 
         super().__init__()
