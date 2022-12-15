@@ -72,6 +72,8 @@ Requests is currently only available from git:
 
     $ python -m pip install git+https://gitlab.com/HeXeDMinD/ufc-data-scraper.git
 
+## [Check out my other projects](http://www.mypersonalsite.co.za)
+
 ## Fighter Object
 
 -  **fighter_url**  *- (str)* A link to the fighter on the UFC website.
