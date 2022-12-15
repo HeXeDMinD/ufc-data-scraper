@@ -234,15 +234,3 @@ class _FmidFinder:
             raise Exception(f"FMID could not be found for event url. {self._event_url}")
 
         return fmid
-
-
-def find_fmid(event_url: str) -> int:
-    """Gets event fmids from url, fmid can be used as API query.
-
-    Returns:
-        int: Event FMID, can be used as API query.
-    """
-
-    fmid_finder = _FmidFinder(event_url)
-
-    return fmid_finder._get_event_fmid()

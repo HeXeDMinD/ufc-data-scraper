@@ -22,6 +22,20 @@ or convert that Fighter or any other related object into a dictionary.
     >>> fighter_dict = fighter.to_dict()
     >>> fighter_record_dict = fighter.record.to_dict()
     
+## Get event FMID
+
+Find internal event id(fmid) using only the event page url. This can be used to get event data directly.
+
+    >>> from ufc_data_scraper import get_event_fmid
+
+    >>> event_url = "https://www.ufc.com/event/ufc-282"
+
+    >>> event_fmid = ufc_scraper.get_event_fmid(event_url)
+
+    >>> type(event)
+
+    1124
+
 ## Scrape event pages
 
 Easily scrape an event page and get a more convenient Event object to work with.

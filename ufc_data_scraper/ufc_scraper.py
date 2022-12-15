@@ -1,10 +1,21 @@
 from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
 from ufc_data_scraper.custom_objects.fighter import Fighter
 
-from ufc_data_scraper.scraper import event_fmid_finder
+from ufc_data_scraper.scraper.event_fmid_finder import _FmidFinder
 from ufc_data_scraper.scraper.event_scraper import _EventScraper
 from ufc_data_scraper.custom_objects.event import Event
 
+
+def get_event_fmid(event_url: str) -> int:
+    """Gets event fmids from url, fmid can be used as API query.
+
+    Returns:
+        int: Event FMID, can be used as API query.
+    """
+
+    fmid_finder = _FmidFinder(event_url)
+
+    return fmid_finder._get_event_fmid()
 
 def scrape_fighter_url(fighter_url: str) -> Fighter:
     """Scrapes fighter page.
@@ -34,7 +45,9 @@ def scrape_event_url(event_url: str) -> Event:
     Returns:
         Event: Returns event object.
     """
-    event_fmid = event_fmid_finder.find_fmid(event_url)
+    
+    event_fmid = get_event_fmid(event_url)
+    
     event_scraper = _EventScraper(event_fmid)
 
     return event_scraper._scrape_event()
