@@ -15,7 +15,7 @@ def get_event_fmid(event_url: str) -> int:
 
     fmid_finder = _FmidFinder()
 
-    return fmid_finder._get_event_fmid(event_url)
+    return fmid_finder.get_event_fmid(event_url)
 
 
 def scrape_fighter_url(fighter_url: str) -> Fighter:

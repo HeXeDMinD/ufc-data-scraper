@@ -220,7 +220,7 @@ class _FmidFinder:
         return None
 
     @classmethod
-    def _get_event_fmid(cls, event_url: str) -> int:
+    def get_event_fmid(cls, event_url: str) -> int:
         """Gets event fmids from url, fmid can be used as API query.
 
         Returns:

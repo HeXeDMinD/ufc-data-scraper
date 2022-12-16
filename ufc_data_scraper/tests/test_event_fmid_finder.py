@@ -117,6 +117,6 @@ class TestEventFmidFinder:
     def test_get_event_fmid(self):
         test_url = "https://www.ufc.com/event/ufc-282"
         expected = 1124
-        actual = self.test_fmid_finder._get_event_fmid(test_url)
+        actual = self.test_fmid_finder.get_event_fmid(test_url)
 
         assert actual == expected
