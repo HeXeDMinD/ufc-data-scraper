@@ -535,8 +535,8 @@ class TestEventScraper:
         expected = ["Main", "Prelims1", "Prelims2"]
         actual = self.test_event.card_segments
 
-        for name in expected:
-            assert actual[name].segment_name == name
+        for key in expected:
+            assert actual[key].name == key
 
     def test_get_card_segments_start_times(self):
         expected = ["2022-12-11T03:00Z", "2022-12-11T01:00Z", "2022-12-10T23:30Z"]

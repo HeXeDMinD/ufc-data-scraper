@@ -361,22 +361,22 @@ class EventScraper:
         """Parse each card segment in event data, convert each into a CardSegment objects and return them as a dict.
 
         Returns:
-            dict: Dictionary of card segements. segment_name: CardSegment
+            dict: Dictionary of card segements. name: CardSegment
         """
 
         fight_card = self._event_data.get("FightCard")
 
         card_segments = {}
         for fight in fight_card:
-            segment_name = fight.get("CardSegment")
+            name = fight.get("CardSegment")
             start_time = fight.get("CardSegmentStartTime")
             broadcaster = fight.get("CardSegmentBroadcaster")
             parsed_fight = self._parse_fight(fight)
-            if segment_name in card_segments.keys():
-                card_segments[segment_name].fights.append(parsed_fight)
+            if name in card_segments.keys():
+                card_segments[name].fights.append(parsed_fight)
             else:
-                card_segments[segment_name] = CardSegment(
-                    segment_name,
+                card_segments[name] = CardSegment(
+                    name,
                     convert_date(start_time),
                     broadcaster,
                     fights=[parsed_fight],

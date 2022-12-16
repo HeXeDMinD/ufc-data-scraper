@@ -149,16 +149,16 @@ class Fight(_BaseObject):
 
 class CardSegment(_BaseObject):
     def __init__(
-        self, segment_name: str, start_time: datetime, broadcaster: str, fights: list
+        self, name: str, start_time: datetime, broadcaster: str, fights: list
     ) -> None:
-        self.segment_name = segment_name
+        self.name = name
         self.start_time = start_time
         self.broadcaster = broadcaster
 
         self.fights = fights
 
     def __str__(self) -> str:
-        return self.segment_name
+        return self.name
 
 
 class Event(_BaseObject):

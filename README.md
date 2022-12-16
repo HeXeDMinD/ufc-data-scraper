@@ -184,7 +184,7 @@ Requests is currently only available from git:
 - **tricode** *- (str)* Country's tricode. i.e "USA"
 
 ### CardSegment Object
-- **segment_name**  *- (str)* Card segment name. i.e "Main" or "Prelims1"
+- **name**  *- (str)* Card segment name. i.e "Main" or "Prelims1"
 - **start_time** *- (datetime)* Card segment start time, localised to GMT.
 - **broadcaster**  *- (str)* Broadcaster. i.e "UFC  Fight  Pass" or "PPV"
 - **fights**  *- (list)* A list of [Fight objects](#fight-object)
