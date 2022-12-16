@@ -8,8 +8,7 @@ from ufc_data_scraper.scraper.event_fmid_finder import _FmidFinder
 
 
 class TestEventFmidFinder:
-    test_url = "https://www.ufc.com/event/ufc-282"
-    test_fmid_finder = _FmidFinder(test_url)
+    test_fmid_finder = _FmidFinder()
 
     def test_page_is_valid_valid_page(self):
         test_page = "<h3></h3>"
@@ -116,7 +115,8 @@ class TestEventFmidFinder:
         assert actual == expected
 
     def test_get_event_fmid(self):
+        test_url = "https://www.ufc.com/event/ufc-282"
         expected = 1124
-        actual = self.test_fmid_finder._get_event_fmid()
+        actual = self.test_fmid_finder._get_event_fmid(test_url)
 
         assert actual == expected

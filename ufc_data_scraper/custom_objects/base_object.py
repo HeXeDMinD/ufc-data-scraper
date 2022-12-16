@@ -36,6 +36,6 @@ class _BaseObject:
             for key, value in object.items():
                 object_dict[key] = self.__dump_object(value)
             return object_dict
-        else:  
+        else:
             # If a custom object we start the process over
             return self.__dump_object(object)

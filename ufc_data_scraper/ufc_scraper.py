@@ -13,9 +13,10 @@ def get_event_fmid(event_url: str) -> int:
         int: Event FMID, can be used as API query.
     """
 
-    fmid_finder = _FmidFinder(event_url)
+    fmid_finder = _FmidFinder()
 
-    return fmid_finder._get_event_fmid()
+    return fmid_finder._get_event_fmid(event_url)
+
 
 def scrape_fighter_url(fighter_url: str) -> Fighter:
     """Scrapes fighter page.
@@ -45,9 +46,9 @@ def scrape_event_url(event_url: str) -> Event:
     Returns:
         Event: Returns event object.
     """
-    
+
     event_fmid = get_event_fmid(event_url)
-    
+
     event_scraper = _EventScraper(event_fmid)
 
     return event_scraper._scrape_event()
