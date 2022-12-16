@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from ufc_data_scraper.custom_objects.base_object import _BaseObject
-from ufc_data_scraper.custom_objects.fighter import Fighter
+from ufc_data_scraper.models.base import Model
+from ufc_data_scraper.models.fighter import Fighter
 
 
-class Location(_BaseObject):
+class Location(Model):
     def __init__(self, venue: str, city: str, country: str, tricode: str) -> None:
         self.venue = venue
         self.city = city
@@ -15,7 +15,7 @@ class Location(_BaseObject):
         return f"{self.venue} - {self.city}, {self.country}"
 
 
-class Result(_BaseObject):
+class Result(Model):
     def __init__(
         self,
         method: str,
@@ -46,7 +46,7 @@ class Result(_BaseObject):
         return self.method
 
 
-class WeightClass(_BaseObject):
+class WeightClass(Model):
     def __init__(self, description: str, abbreviation: str, weight: str) -> None:
         self.description = description
         self.abbreviation = abbreviation
@@ -56,7 +56,7 @@ class WeightClass(_BaseObject):
         return self.description
 
 
-class Accolade(_BaseObject):
+class Accolade(Model):
     def __init__(self, description: str, type: str) -> None:
         self.description = description
         self.type = type
@@ -65,7 +65,7 @@ class Accolade(_BaseObject):
         return self.description
 
 
-class RuleSet(_BaseObject):
+class RuleSet(Model):
     def __init__(self, description: str, possible_rounds: str) -> None:
         self.description = description
         self.possible_rounds = possible_rounds
@@ -74,7 +74,7 @@ class RuleSet(_BaseObject):
         return self.description
 
 
-class FightScore(_BaseObject):
+class FightScore(Model):
     def __init__(self, judge_name: str, score_red: int, score_blue: int) -> None:
         self.judge_name = judge_name
         self.score_red = score_red
@@ -84,7 +84,7 @@ class FightScore(_BaseObject):
         return f"{self.judge_name}: {self.score_red} - {self.score_blue}"
 
 
-class FighterStats(_BaseObject):
+class FighterStats(Model):
     def __init__(
         self,
         fighter: Fighter,
@@ -109,7 +109,7 @@ class FighterStats(_BaseObject):
         return self.fighter.name
 
 
-class Fight(_BaseObject):
+class Fight(Model):
     def __init__(
         self,
         fight_order: int,
@@ -147,7 +147,7 @@ class Fight(_BaseObject):
         return f"{fighter_1_name} vs {fighter_2_name}"
 
 
-class CardSegment(_BaseObject):
+class CardSegment(Model):
     def __init__(
         self, name: str, start_time: datetime, broadcaster: str, fights: list
     ) -> None:
@@ -161,7 +161,7 @@ class CardSegment(_BaseObject):
         return self.name
 
 
-class Event(_BaseObject):
+class Event(Model):
     def __init__(
         self,
         fmid: int,

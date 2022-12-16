@@ -1,7 +1,7 @@
-from ufc_data_scraper.custom_objects.base_object import _BaseObject
+from ufc_data_scraper.models.base import Model
 
 
-class Record(_BaseObject):
+class Record(Model):
     def __init__(
         self,
         win: int,
@@ -17,7 +17,7 @@ class Record(_BaseObject):
         return f"{self.win}-{self.loss}-{self.draw}"
 
 
-class WinMethod(_BaseObject):
+class WinMethod(Model):
     def __init__(
         self,
         knockout: int,
@@ -39,7 +39,7 @@ class WinMethod(_BaseObject):
         self.average_fight_time = average_fight_time
 
 
-class PhysicalStats(_BaseObject):
+class PhysicalStats(Model):
     def __init__(
         self,
         age: int,
@@ -59,7 +59,7 @@ class PhysicalStats(_BaseObject):
         return f"{self.height}, {self.weight}"
 
 
-class StrikePosition(_BaseObject):
+class StrikePosition(Model):
     def __init__(
         self,
         standing: int,
@@ -78,7 +78,7 @@ class StrikePosition(_BaseObject):
         self.ground_per = ground_per
 
 
-class StrikeTarget(_BaseObject):
+class StrikeTarget(Model):
     def __init__(
         self,
         head: int,
@@ -97,7 +97,7 @@ class StrikeTarget(_BaseObject):
         self.leg_per = leg_per
 
 
-class Striking(_BaseObject):
+class Striking(Model):
     def __init__(
         self,
         striking_accuracy: int,
@@ -124,7 +124,7 @@ class Striking(_BaseObject):
         self.strike_target = strike_target
 
 
-class Grappling(_BaseObject):
+class Grappling(Model):
     def __init__(
         self,
         takedown_accuracy: int,
@@ -146,7 +146,7 @@ class Grappling(_BaseObject):
         return self.takedown_accuracy
 
 
-class Fighter(_BaseObject):
+class Fighter(Model):
     def __init__(
         self,
         fighter_url: str,

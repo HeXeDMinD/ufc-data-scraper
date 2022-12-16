@@ -1,5 +1,5 @@
 from ufc_data_scraper.scraper.event_scraper import EventScraper
-from ufc_data_scraper.custom_objects.event import *
+from ufc_data_scraper.models.event import *
 from ufc_data_scraper.scraper.utils import convert_date
 
 

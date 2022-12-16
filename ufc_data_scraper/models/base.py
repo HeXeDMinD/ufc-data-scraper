@@ -4,7 +4,7 @@ from datetime import datetime
 base_classes = [int, str, float, bool, datetime]
 
 
-class _BaseObject:
+class Model:
     def to_dict(self) -> dict:
         """Returns object attributes as a dictionary.
 

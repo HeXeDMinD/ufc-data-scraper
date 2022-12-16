@@ -1,8 +1,8 @@
 import requests
 import concurrent.futures
 
-from ufc_data_scraper.custom_objects.event import *
-from ufc_data_scraper.custom_objects.fighter import Fighter
+from ufc_data_scraper.models.event import *
+from ufc_data_scraper.models.fighter import Fighter
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
 from ufc_data_scraper.scraper.utils import convert_date
 

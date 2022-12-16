@@ -1,5 +1,5 @@
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
-from ufc_data_scraper.custom_objects.fighter import *
+from ufc_data_scraper.models.fighter import *
 
 
 class TestFighterScraper:

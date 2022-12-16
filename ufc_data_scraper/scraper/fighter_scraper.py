@@ -4,7 +4,7 @@ import re
 from bs4 import BeautifulSoup, Tag, ResultSet
 from unidecode import unidecode
 
-from ufc_data_scraper.custom_objects.fighter import *
+from ufc_data_scraper.models.fighter import *
 
 
 class FighterScraper:

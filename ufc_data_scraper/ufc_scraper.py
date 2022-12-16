@@ -1,9 +1,9 @@
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
-from ufc_data_scraper.custom_objects.fighter import Fighter
+from ufc_data_scraper.models.fighter import Fighter
 
 from ufc_data_scraper.scraper.event_fmid_finder import FmidFinder
 from ufc_data_scraper.scraper.event_scraper import EventScraper
-from ufc_data_scraper.custom_objects.event import Event
+from ufc_data_scraper.models.event import Event
 
 
 def get_event_fmid(event_url: str) -> int:
