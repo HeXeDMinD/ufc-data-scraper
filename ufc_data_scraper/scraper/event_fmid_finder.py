@@ -5,7 +5,7 @@ import pytz
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime, timedelta
 
-from ufc_data_scraper.scraper.utils import _convert_date
+from ufc_data_scraper.scraper.utils import convert_date
 
 
 class _FmidFinder:
@@ -209,7 +209,7 @@ class _FmidFinder:
             scraped_date = cls._get_event_date(soup)
             scraped_date = cls._convert_scraped_date(scraped_date)
             if scraped_date:
-                api_date = _convert_date(
+                api_date = convert_date(
                     start_time=data["StartTime"], timezone=data["TimeZone"]
                 )
                 if scraped_date - api_date <= timedelta(days=2):

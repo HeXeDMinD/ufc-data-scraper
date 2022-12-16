@@ -3,7 +3,7 @@ import pytz
 from datetime import datetime
 
 
-def _convert_date(date: str) -> datetime:
+def convert_date(date: str) -> datetime:
     """Converts API response date into usable format.
 
     Args:

@@ -1,6 +1,6 @@
 from ufc_data_scraper.scraper.event_scraper import _EventScraper
 from ufc_data_scraper.custom_objects.event import *
-from ufc_data_scraper.scraper.utils import _convert_date
+from ufc_data_scraper.scraper.utils import convert_date
 
 
 class TestEventScraper:
@@ -282,7 +282,7 @@ class TestEventScraper:
         expected = {
             "fmid": 1124,
             "name": "UFC 282: Blachowicz vs. Ankalaev",
-            "date": _convert_date("2022-12-10T23:30Z"),
+            "date": convert_date("2022-12-10T23:30Z"),
             "status": "Final",
         }
         actual = self.test_event.__dict__
@@ -543,7 +543,7 @@ class TestEventScraper:
         actual = self.test_event.card_segments
 
         for i, segment in enumerate(actual.keys()):
-            assert actual[segment].start_time == _convert_date(expected[i])
+            assert actual[segment].start_time == convert_date(expected[i])
 
     def test_get_card_segments_broadcasters(self):
         expected = ["PPV", "ESPN 2", "UFC Fight Pass"]

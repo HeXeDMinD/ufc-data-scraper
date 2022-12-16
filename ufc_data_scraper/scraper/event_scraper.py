@@ -4,7 +4,7 @@ import concurrent.futures
 from ufc_data_scraper.custom_objects.event import *
 from ufc_data_scraper.custom_objects.fighter import Fighter
 from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
-from ufc_data_scraper.scraper.utils import _convert_date
+from ufc_data_scraper.scraper.utils import convert_date
 
 
 class _EventScraper:
@@ -377,7 +377,7 @@ class _EventScraper:
             else:
                 card_segments[segment_name] = CardSegment(
                     segment_name,
-                    _convert_date(start_time),
+                    convert_date(start_time),
                     broadcaster,
                     fights=[parsed_fight],
                 )
@@ -396,7 +396,7 @@ class _EventScraper:
         event_info = {
             "fmid": self._event_fmid,
             "name": self._event_data.get("Name"),
-            "date": _convert_date(event_date),
+            "date": convert_date(event_date),
             "status": self._event_data.get("Status"),
             "location": self._get_location_obj(),
             "card_segments": self._get_card_segments(),
