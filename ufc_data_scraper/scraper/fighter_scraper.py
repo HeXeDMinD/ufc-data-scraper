@@ -7,7 +7,7 @@ from unidecode import unidecode
 from ufc_data_scraper.custom_objects.fighter import *
 
 
-class _FighterScraper:
+class FighterScraper:
     def __init__(self, fighter_url: str) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
@@ -623,7 +623,7 @@ class _FighterScraper:
 
         return stats
 
-    def _scrape_fighter(self) -> Fighter:
+    def scrape_fighter(self) -> Fighter:
         """Scrapes fighter data from fighter url and returns it as a Fighter object.
 
         Args:

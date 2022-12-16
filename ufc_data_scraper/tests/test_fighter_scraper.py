@@ -1,12 +1,12 @@
-from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
+from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
 from ufc_data_scraper.custom_objects.fighter import *
 
 
 class TestFighterScraper:
     test_url = "https://www.ufc.com/athlete/ali-alqaisi"  # Retired fighter
 
-    test_fighter_scraper = _FighterScraper(test_url)
-    test_fighter = test_fighter_scraper._scrape_fighter()
+    test_fighter_scraper = FighterScraper(test_url)
+    test_fighter = test_fighter_scraper.scrape_fighter()
 
     def test_set_fighter_url_lower_case(self):
         test_url = "http://www.ufc.com/athlete/Jan-Blachowicz"

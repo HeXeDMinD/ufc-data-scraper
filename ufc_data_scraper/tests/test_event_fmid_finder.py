@@ -4,11 +4,11 @@ import pytz
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-from ufc_data_scraper.scraper.event_fmid_finder import _FmidFinder
+from ufc_data_scraper.scraper.event_fmid_finder import FmidFinder
 
 
 class TestEventFmidFinder:
-    test_fmid_finder = _FmidFinder()
+    test_fmid_finder = FmidFinder()
 
     def test_page_is_valid_valid_page(self):
         test_page = "<h3></h3>"

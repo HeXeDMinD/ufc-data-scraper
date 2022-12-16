@@ -3,11 +3,11 @@ import concurrent.futures
 
 from ufc_data_scraper.custom_objects.event import *
 from ufc_data_scraper.custom_objects.fighter import Fighter
-from ufc_data_scraper.scraper.fighter_scraper import _FighterScraper
+from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
 from ufc_data_scraper.scraper.utils import convert_date
 
 
-class _EventScraper:
+class EventScraper:
     def __init__(self, event_fmid: int) -> None:
         """Queries private UFC api and returns query as an Event object.
 
@@ -168,8 +168,8 @@ class _EventScraper:
         """
 
         try:
-            fighter_scraper = _FighterScraper(fighter_url)
-            fighter = fighter_scraper._scrape_fighter()
+            fighter_scraper = FighterScraper(fighter_url)
+            fighter = fighter_scraper.scrape_fighter()
         except requests.exceptions.HTTPError:
             fighter = None
 
@@ -384,7 +384,7 @@ class _EventScraper:
 
         return card_segments
 
-    def _scrape_event(self) -> Event:
+    def scrape_event(self) -> Event:
         """Queries private UFC api and returns query as an Event object.
 
         Returns:

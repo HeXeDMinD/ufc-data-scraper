@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from ufc_data_scraper.scraper.utils import convert_date
 
 
-class _FmidFinder:
+class FmidFinder:
     @classmethod
     def _page_is_valid(cls, soup: BeautifulSoup) -> bool:
         """Checks if page is empty.

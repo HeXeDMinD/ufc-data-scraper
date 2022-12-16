@@ -1,4 +1,4 @@
-from ufc_data_scraper.scraper.event_scraper import _EventScraper
+from ufc_data_scraper.scraper.event_scraper import EventScraper
 from ufc_data_scraper.custom_objects.event import *
 from ufc_data_scraper.scraper.utils import convert_date
 
@@ -6,8 +6,8 @@ from ufc_data_scraper.scraper.utils import convert_date
 class TestEventScraper:
     test_fmid = 1124  # Completed Event
 
-    test_event_scraper = _EventScraper(1124)
-    test_event = test_event_scraper._scrape_event()
+    test_event_scraper = EventScraper(1124)
+    test_event = test_event_scraper.scrape_event()
 
     test_fight_1 = {
         "FightId": 10227,
