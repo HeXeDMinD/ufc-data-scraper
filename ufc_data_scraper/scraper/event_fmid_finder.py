@@ -209,9 +209,7 @@ class FmidFinder:
             scraped_date = cls._get_event_date(soup)
             scraped_date = cls._convert_scraped_date(scraped_date)
             if scraped_date:
-                api_date = convert_date(
-                    start_time=data["StartTime"], timezone=data["TimeZone"]
-                )
+                api_date = convert_date(date=data["StartTime"])
                 if scraped_date - api_date <= timedelta(days=2):
                     return current_fmid
 
