@@ -17,7 +17,7 @@ class FighterScraper:
 
         Args:
             fighter_url (url): UFC fighter page url.
-            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. Requesting incorrect_urls each time can be time consuming, so EventScraper will supply a preloaded dict. Defaults to utils.get_incorrect_urls().
+            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. If supplied the scraper won't request it from web app.
 
         >>> fighter_scraper = _FighterScraper(fighter_url)
         >>> fighter = fighter_scraper._scrape_fighter()
