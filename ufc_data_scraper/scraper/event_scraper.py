@@ -369,7 +369,7 @@ class EventScraper:
         card_segments = {}
         for fight in fight_card:
             name = fight.get("CardSegment") or "Main"
-            start_time = fight.get("CardSegmentStartTime") or convert_date(self._event_data.get("StartTime"))
+            start_time = fight.get("CardSegmentStartTime") or self._event_data.get("StartTime")
             broadcaster = fight.get("CardSegmentBroadcaster")
             parsed_fight = self._parse_fight(fight)
             if name in card_segments.keys():
