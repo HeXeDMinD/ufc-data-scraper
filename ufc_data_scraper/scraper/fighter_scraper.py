@@ -665,9 +665,16 @@ class FighterScraper:
 
         physical_stats_obj = self._get_physical_stats_obj()
 
-        win_method_obj = self._get_win_method_obj(stats_section[1])
-
-        strike_position_obj = self._get_strike_position_obj(stats_section[0])
+        try:
+            win_method_obj = self._get_win_method_obj(stats_section[1])
+        except IndexError:
+            win_method_obj = None
+        
+        try:
+            strike_position_obj = self._get_strike_position_obj(stats_section[0])
+        except IndexError:
+            strike_position_obj = None
+            
         strike_target_obj = self._get_strike_target_obj()
 
         striking_stats = self._get_striking_stats(stats_targets)
