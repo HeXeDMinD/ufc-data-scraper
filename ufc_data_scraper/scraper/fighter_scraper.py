@@ -269,12 +269,13 @@ class FighterScraper:
 
         return average_fight_time
 
-    def _get_win_method_obj(self, stats_section: ResultSet) -> WinMethod:
+    def _get_win_method_obj(self, stats_section: ResultSet, index: int) -> WinMethod:
         """Get win method information from ResultSet and return it as a WinMethod object.
 
         Args:
             stats_section (ResultSet): ResultSet object containing fighters win method information.
-
+            index (int): Index for correct stats section.
+            
         Returns:
             WinMethod: WinMethod object containing fighter's win method information.
         """
@@ -282,7 +283,7 @@ class FighterScraper:
         average_fight_time = self._get_average_fight_time()
 
         try:
-            win_method_stats = self._parse_stats_section(stats_section)
+            win_method_stats = self._parse_stats_section(stats_section[index])
             knockout, knockout_per = win_method_stats["ko/tko"]
             decision, decision_per = win_method_stats["dec"]
             submission, submission_per = win_method_stats["sub"]
@@ -336,18 +337,19 @@ class FighterScraper:
 
         return PhysicalStats(**physical_stats)
 
-    def _get_strike_position_obj(self, stats_section: ResultSet) -> StrikePosition:
+    def _get_strike_position_obj(self, stats_section: ResultSet, index: int) -> StrikePosition:
         """Get fighter's strike position information from ResultSet and return it as a StrikePosition object.
 
         Args:
             stats_section (ResultSet): ResultSet object containing fighters strike position information.
+            index (int): Index for correct stats section.
 
         Returns:
             StrikePosition: StrikePosition object containing fighter's strike position information.
         """
 
         try:
-            position_stats = self._parse_stats_section(stats_section)
+            position_stats = self._parse_stats_section(stats_section[index])
             standing, standing_per = position_stats["standing"]
             clinch, clinch_per = position_stats["clinch"]
             ground, ground_per = position_stats["ground"]
@@ -665,15 +667,9 @@ class FighterScraper:
 
         physical_stats_obj = self._get_physical_stats_obj()
 
-        try:
-            win_method_obj = self._get_win_method_obj(stats_section[1])
-        except IndexError:
-            win_method_obj = None
+        win_method_obj = self._get_win_method_obj(stats_section, 1)
         
-        try:
-            strike_position_obj = self._get_strike_position_obj(stats_section[0])
-        except IndexError:
-            strike_position_obj = None
+        strike_position_obj = self._get_strike_position_obj(stats_section, 0)
             
         strike_target_obj = self._get_strike_target_obj()
 
