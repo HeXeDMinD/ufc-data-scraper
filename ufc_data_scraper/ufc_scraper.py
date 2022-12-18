@@ -5,6 +5,8 @@ from ufc_data_scraper.scraper.event_fmid_finder import FmidFinder
 from ufc_data_scraper.scraper.event_scraper import EventScraper
 from ufc_data_scraper.models.event import Event
 
+from ufc_data_scraper.scraper.utils import get_incorrect_urls
+
 
 def get_event_fmid(event_url: str) -> int:
     """Gets event fmids from url, fmid can be used as API query.
@@ -30,7 +32,9 @@ def scrape_fighter_url(fighter_url: str) -> Fighter:
         Fighter: Returns fighter object.
     """
 
-    fighter_scraper = FighterScraper(fighter_url)
+    incorrect_urls = get_incorrect_urls()
+
+    fighter_scraper = FighterScraper(fighter_url, incorrect_urls)
 
     return fighter_scraper.scrape_fighter()
 

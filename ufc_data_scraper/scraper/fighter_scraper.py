@@ -4,42 +4,28 @@ import re
 from bs4 import BeautifulSoup, Tag, ResultSet
 from unidecode import unidecode
 
+from ufc_data_scraper.scraper import utils
+
 from ufc_data_scraper.models.fighter import *
 
 
 class FighterScraper:
-    def __init__(self, fighter_url: str) -> None:
+    def __init__(
+        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()
+    ) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
         Args:
             fighter_url (url): UFC fighter page url.
+            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. Requesting incorrect_urls each time can be time consuming, so EventScraper will supply a preloaded dict. Defaults to utils.get_incorrect_urls().
 
         >>> fighter_scraper = _FighterScraper(fighter_url)
         >>> fighter = fighter_scraper._scrape_fighter()
         """
 
         self._soup = None
-        self._incorrect_urls = self._get_incorrect_urls()
+        self._incorrect_urls = incorrect_urls
         self._fighter_url = self._set_fighter_url(fighter_url)
-
-    def _get_incorrect_urls(self) -> dict:
-        """Queries a google web app for up to date list of incorrect fighter urls.
-
-        Returns:
-            dict: Dictionary of incorrect fighter urls with their correct counterpart.
-        """
-
-        google_web_app = f"https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
-
-        site_response = requests.get(google_web_app)
-
-        if site_response.status_code != 200:
-            return None
-
-        return {
-            incorrect.lower(): correct.lower()
-            for incorrect, correct in site_response.json().items()
-        }
 
     def _set_fighter_url(self, fighter_url: str) -> str:
         """Replaces incorrect urls and removes inconsistancies from url.
@@ -52,7 +38,6 @@ class FighterScraper:
         """
 
         fighter_url = fighter_url.lower()
-        incorrect_urls = self._get_incorrect_urls()
 
         fighter_url = fighter_url.replace("https", "http")
 
@@ -62,7 +47,7 @@ class FighterScraper:
                 fighter_url = fighter_url.replace(banned_char, "")
 
         try:
-            fighter_url = incorrect_urls[fighter_url]
+            fighter_url = self._incorrect_urls[fighter_url]
         except (KeyError, TypeError):
             fighter_url = fighter_url
 
@@ -275,7 +260,7 @@ class FighterScraper:
         Args:
             stats_section (ResultSet): ResultSet object containing fighters win method information.
             index (int): Index for correct stats section.
-            
+
         Returns:
             WinMethod: WinMethod object containing fighter's win method information.
         """
@@ -337,7 +322,9 @@ class FighterScraper:
 
         return PhysicalStats(**physical_stats)
 
-    def _get_strike_position_obj(self, stats_section: ResultSet, index: int) -> StrikePosition:
+    def _get_strike_position_obj(
+        self, stats_section: ResultSet, index: int
+    ) -> StrikePosition:
         """Get fighter's strike position information from ResultSet and return it as a StrikePosition object.
 
         Args:
@@ -668,9 +655,9 @@ class FighterScraper:
         physical_stats_obj = self._get_physical_stats_obj()
 
         win_method_obj = self._get_win_method_obj(stats_section, 1)
-        
+
         strike_position_obj = self._get_strike_position_obj(stats_section, 0)
-            
+
         strike_target_obj = self._get_strike_target_obj()
 
         striking_stats = self._get_striking_stats(stats_targets)
