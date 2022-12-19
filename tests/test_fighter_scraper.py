@@ -1,8 +1,8 @@
-from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
+from scraper import FighterScraper
 
-from ufc_data_scraper.models.fighter import *
+from models.fighter import *
 
-from ufc_data_scraper.scraper.utils import get_incorrect_urls
+from utils import get_incorrect_urls
 
 
 class TestFighterScraper:

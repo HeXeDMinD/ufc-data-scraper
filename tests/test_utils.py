@@ -2,7 +2,7 @@ import pytz
 
 from datetime import datetime
 
-from ufc_data_scraper.scraper.utils import convert_date
+from utils import convert_date
 
 
 class TestUtils:

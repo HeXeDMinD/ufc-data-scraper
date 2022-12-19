@@ -17,9 +17,11 @@ setuptools.setup(
     },
     license="MIT",
     packages=[
-        "ufc_data_scraper",
-        "ufc_data_scraper.models",
-        "ufc_data_scraper.scraper",
+        "models",
+        "models.event",
+        "models.fighter",
+        "scraper",
+        "utils"
     ],
     install_requires=["requests", "bs4", "pytz", "unidecode"],
 )

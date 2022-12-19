@@ -1,6 +1,8 @@
-from ufc_data_scraper.scraper.event_scraper import EventScraper
-from ufc_data_scraper.models.event import *
-from ufc_data_scraper.scraper.utils import convert_date
+from scraper import EventScraper
+
+from models.event import *
+
+from utils import convert_date
 
 
 class TestEventScraper:

@@ -5,7 +5,7 @@ import pytz
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime, timedelta
 
-from ufc_data_scraper.scraper.utils import convert_date
+from utils import convert_date
 
 
 class FmidFinder:

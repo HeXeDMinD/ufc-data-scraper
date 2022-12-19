@@ -1,12 +1,12 @@
 import requests
 import concurrent.futures
 
-from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
+from scraper.fighter_scraper import FighterScraper
 
-from ufc_data_scraper.models.event import *
-from ufc_data_scraper.models.fighter import Fighter
+from models.event import *
+from models.fighter import Fighter
 
-from ufc_data_scraper.scraper.utils import convert_date, get_incorrect_urls
+from utils import convert_date, get_incorrect_urls
 
 
 class EventScraper:

@@ -4,7 +4,7 @@ import pytz
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-from ufc_data_scraper.scraper.event_fmid_finder import FmidFinder
+from scraper import FmidFinder
 
 
 class TestEventFmidFinder:
