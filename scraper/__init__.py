@@ -1,3 +1,0 @@
-from scraper.fmid_finder import FmidFinder
-from scraper.event_scraper import EventScraper
-from scraper.fighter_scraper import FighterScraper
