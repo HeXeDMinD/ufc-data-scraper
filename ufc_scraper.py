@@ -1,9 +1,6 @@
-from scraper import FighterScraper
-from models.fighter import Fighter
+from scraper import FmidFinder, FighterScraper, EventScraper
 
-from scraper import FmidFinder
-from scraper import EventScraper
-from models.event import Event
+from models import Fighter, Event
 
 
 def get_event_fmid(event_url: str) -> int:
