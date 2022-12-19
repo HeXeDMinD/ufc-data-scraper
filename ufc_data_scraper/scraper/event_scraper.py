@@ -381,9 +381,9 @@ class EventScraper:
                 card_segments[name].fights.append(parsed_fight)
             else:
                 card_segments[name] = CardSegment(
-                    name,
-                    convert_date(start_time),
-                    broadcaster,
+                    name=name,
+                    start_time=convert_date(start_time),
+                    broadcaster=broadcaster or "Unlisted",
                     fights=[parsed_fight],
                 )
 
