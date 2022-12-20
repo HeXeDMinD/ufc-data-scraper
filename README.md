@@ -5,7 +5,7 @@
 **UFC Data Scraper** is a simple webscraping library.
 ## Scrape fighter pages
 
-Easily scrape a fighters page and get a more convenient Fighter object to work with.
+Easily scrape a fighters page and get a more convenient Fighter dataclass to work with.
 
     >>> from ufc_data_scraper import ufc_scraper
 
@@ -17,10 +17,11 @@ Easily scrape a fighters page and get a more convenient Fighter object to work w
 
     'Fighter'
     
-or convert that Fighter or any other related object into a dictionary.
+or convert that Fighter or any other related dataclass into a dictionary using asdict.
 
-    >>> fighter_dict = fighter.to_dict()
-    >>> fighter_record_dict = fighter.record.to_dict()
+    >>> from dataclasses import asdict
+    >>> fighter_dict = asdict(fighter)
+    >>> fighter_record_dict = asdict(fighter.record)
     
 ## Get event FMID
 
@@ -38,7 +39,7 @@ Find internal event id(fmid) using only the event page url. This can be used to 
 
 ## Scrape event pages
 
-Easily scrape an event page and get a more convenient Event object to work with.
+Easily scrape an event page and get a more convenient Event dataclass to work with.
 
 Know the internal event id(fmid)?
 
@@ -61,10 +62,11 @@ or leave it to the library to figure out.
     'Event'
 
 
-or convert that Event or any other related object into a dictionary.
+or convert that Event or any other related dataclass into a dictionary using asdict.
 
-    >>> event_dict = event.to_dict()
-    >>> event_location_dict = event.location.to_dict()
+    >>> from dataclasses import asdict
+    >>> event_dict = asdict(event)
+    >>> event_location_dict = asdict(event.location)
     
 ## Installing Ufc Data Scraper
 

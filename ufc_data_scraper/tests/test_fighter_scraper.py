@@ -1,6 +1,6 @@
 from ufc_data_scraper.scraper import FighterScraper
 
-from ufc_data_scraper.models.fighter import *
+from ufc_data_scraper.data_models.fighter import *
 
 from ufc_data_scraper.utils import get_incorrect_urls
 

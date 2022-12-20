@@ -1,6 +1,6 @@
 from ufc_data_scraper.scraper import FmidFinder, FighterScraper, EventScraper
 
-from ufc_data_scraper.models import Fighter, Event
+from ufc_data_scraper.data_models import Fighter, Event
 
 
 def get_event_fmid(event_url: str) -> int:

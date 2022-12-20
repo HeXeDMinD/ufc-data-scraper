@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="ufc_data_scraper",
-    version="0.9.61",
+    version="0.9.62",
     author="Kyle Leben",
     author_email="leben.kyle.hex@gmail.com",
     description="A simple webscraping library, focused on the UFC website",
@@ -18,9 +18,9 @@ setuptools.setup(
     license="MIT",
     packages=[
         "ufc_data_scraper",
-        "ufc_data_scraper.models",
-        "ufc_data_scraper.models.event",
-        "ufc_data_scraper.models.fighter",
+        "ufc_data_scraper.data_models",
+        "ufc_data_scraper.data_models.event",
+        "ufc_data_scraper.data_models.fighter",
         "ufc_data_scraper.scraper",
         "ufc_data_scraper.utils"
     ],

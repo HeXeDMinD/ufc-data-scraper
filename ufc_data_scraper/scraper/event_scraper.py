@@ -3,8 +3,8 @@ import concurrent.futures
 
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
 
-from ufc_data_scraper.models.event import *
-from ufc_data_scraper.models.fighter import Fighter
+from ufc_data_scraper.data_models.event import *
+from ufc_data_scraper.data_models.fighter import Fighter
 
 from ufc_data_scraper.utils import convert_date, get_incorrect_urls
 
