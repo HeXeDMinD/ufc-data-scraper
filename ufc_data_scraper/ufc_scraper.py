@@ -1,18 +1,6 @@
-from ufc_data_scraper.scraper import FmidFinder, FighterScraper, EventScraper
+from ufc_data_scraper.scraper import get_event_fmid, FighterScraper, EventScraper
 
 from ufc_data_scraper.data_models import Fighter, Event
-
-
-def get_event_fmid(event_url: str) -> int:
-    """Gets event fmids from url, fmid can be used as API query.
-
-    Returns:
-        int: Event FMID, can be used as API query.
-    """
-
-    fmid_finder = FmidFinder()
-
-    return fmid_finder.get_event_fmid(event_url)
 
 
 def scrape_fighter_url(fighter_url: str) -> Fighter:

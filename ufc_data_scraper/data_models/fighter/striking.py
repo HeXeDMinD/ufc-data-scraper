@@ -5,7 +5,7 @@ from ufc_data_scraper.data_models.fighter.strike_target import StrikeTarget
 
 
 @dataclass(frozen=True, order=True)
-class Striking():
+class Striking:
     striking_accuracy: int
     strikes_landed: int
     strikes_attempted: int

@@ -6,7 +6,7 @@ from ufc_data_scraper.data_models.event.location import Location
 
 
 @dataclass(frozen=True, order=True)
-class Event():
+class Event:
     fmid: int
     name: str
     date: datetime

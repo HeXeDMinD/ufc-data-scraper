@@ -27,7 +27,7 @@ or convert that Fighter or any other related dataclass into a dictionary using a
 
 Find internal event id(fmid) using only the event page url. This can be used to get event data directly.
 
-    >>> from ufc_data_scraper import get_event_fmid
+    >>> from ufc_data_scraper import ufc_scraper
 
     >>> event_url = "https://www.ufc.com/event/ufc-282"
 

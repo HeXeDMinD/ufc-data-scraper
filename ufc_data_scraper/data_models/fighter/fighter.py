@@ -8,7 +8,7 @@ from ufc_data_scraper.data_models.fighter.grappling import Grappling
 
 
 @dataclass(frozen=True, order=True)
-class Fighter():
+class Fighter:
     fighter_url: str
     name: str
     nickname: str

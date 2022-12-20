@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class StrikePosition():
+class StrikePosition:
     standing: int
     standing_per: int
     clinch: int

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class StrikeTarget():
+class StrikeTarget:
     head: int
     head_per: int
     body: int

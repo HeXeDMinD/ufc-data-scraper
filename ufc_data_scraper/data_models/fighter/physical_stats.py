@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class PhysicalStats():
+class PhysicalStats:
     age: int
     height: float
     weight: float

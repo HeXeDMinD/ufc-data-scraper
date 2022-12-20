@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class WinMethod():
+class WinMethod:
     knockout: int
     knockout_per: int
     decision: int

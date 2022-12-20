@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class Result():
+class Result:
     method: str
     ending_round: int
     ending_time: str

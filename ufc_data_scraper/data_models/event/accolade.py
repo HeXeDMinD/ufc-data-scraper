@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, order=True)
-class Accolade():
+class Accolade:
     description: str
     type: str

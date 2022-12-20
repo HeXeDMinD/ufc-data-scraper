@@ -5,8 +5,9 @@ from ufc_data_scraper.data_models.event.rule_set import RuleSet
 
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True, order=True)
-class Fight():
+class Fight:
     fight_order: int
     referee_name: str
     fighters_stats: list

@@ -4,7 +4,7 @@ from ufc_data_scraper.data_models.fighter.fighter import Fighter
 
 
 @dataclass(frozen=True, order=True)
-class FighterStats():
+class FighterStats:
     fighter: Fighter
     corner: str
     weigh_in: float
