@@ -54,8 +54,8 @@ def should_fetch_latest(last_fetched: str):
 def get_incorrect_urls():
     filename = "incorrect_urls.json"
     working_dir = os.getcwd()
-    file_path = os.path.join(working_dir, "ufc_data_scraper/data")
-    full_path = f"{file_path}/{filename}"
+    file_path = os.path.join(working_dir, "ufc_data_scraper\data")
+    full_path = f"{file_path}\{filename}"
 
     if os.path.exists(full_path):
         with open(full_path, "r", encoding="utf-8") as file:
