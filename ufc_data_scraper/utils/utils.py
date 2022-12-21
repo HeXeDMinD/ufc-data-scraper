@@ -26,26 +26,22 @@ def convert_date(date: str) -> datetime:
 
 
 def fetch_latest_urls(full_path: str) -> dict:
-    data_url = "https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
+    data_url = "https://raw.githubusercontent.com/HeXeDMinD/ufc-data-scraper/main/ufc_data_scraper/data/incorrect_urls.json"
 
     site_response = requests.get(data_url)
 
     if site_response.status_code != 200:
         return None
 
-    latest_urls = {
-        incorrect.lower(): correct.lower()
-        for incorrect, correct in site_response.json().items()
-    }
+    json_data = site_response.json()
+    json_data["last_fetched"] = datetime.strftime(
+        datetime.now(), "%Y-%m-%d %H:%M")
 
-    json_data = {"last_fetched": datetime.now().strftime(
-        "%Y-%m-%d %H:%M")} | {"incorrect_urls": latest_urls}
     json_dump = json.dumps(json_data, indent=4)
-
     with open(full_path, "w", encoding="utf-8") as file:
         file.write(json_dump)
 
-    return latest_urls
+    return json_data.get("incorrect_urls")
 
 
 def should_fetch_latest(last_fetched: str):

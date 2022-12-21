@@ -72,9 +72,7 @@ or convert that Event or any other related dataclass into a dictionary using asd
 
 Requests is currently only available from git:
 
-    $ python -m pip install git+https://gitlab.com/HeXeDMinD/ufc-data-scraper.git
-
-## [Check out my other projects](http://www.mypersonalsite.co.za)
+    $ python -m pip install git+https://github.com/HeXeDMinD/ufc-data-scraper.git
 
 ## Fighter Object
 
