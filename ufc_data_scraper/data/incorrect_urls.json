@@ -1,7 +1,4 @@
 {
-    "last_fetched": null,
-    "incorrect_urls": {
-        "http://www.ufc.com/athlete/michel-pereira-lima": "http://www.ufc.com/athlete/michel-pereira",
-        "http://www.ufc.com/athlete/raul-rosas-jr.": "http://www.ufc.com/athlete/raul-rosas-jr"
-    }
+    "http://www.ufc.com/athlete/michel-pereira-lima": "http://www.ufc.com/athlete/michel-pereira",
+    "http://www.ufc.com/athlete/raul-rosas-jr.": "http://www.ufc.com/athlete/raul-rosas-jr"
 }

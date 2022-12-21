@@ -6,7 +6,7 @@ from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
 from ufc_data_scraper.data_models.event import *
 from ufc_data_scraper.data_models.fighter import Fighter
 
-from ufc_data_scraper.utils import convert_date
+from ufc_data_scraper.utils import convert_date, get_incorrect_urls
 
 
 class EventScraper:
@@ -23,6 +23,7 @@ class EventScraper:
         self._event_fmid = event_fmid
         self._event_data = self._get_event_data()
         self._fighter_urls = self._get_fighter_urls()
+        self._incorrect_fighter_urls = get_incorrect_urls()
         self._scraped_fighters = self._scrape_fighters()
 
     def _get_event_data(self) -> dict:
@@ -171,7 +172,8 @@ class EventScraper:
         """
 
         try:
-            figher_scraper = FighterScraper(fighter_url)
+            figher_scraper = FighterScraper(
+                fighter_url, self._incorrect_fighter_urls)
             fighter = figher_scraper.scrape_fighter()
         except requests.exceptions.HTTPError:
             fighter = None

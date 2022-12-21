@@ -11,18 +11,20 @@ from ufc_data_scraper.data_models.fighter import *
 
 class FighterScraper:
     def __init__(
-            self, fighter_url: str) -> None:
+        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()
+    ) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
         Args:
             fighter_url (url): UFC fighter page url.
+            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. If supplied the scraper won't request it from web app.
 
         >>> fighter_scraper = _FighterScraper(fighter_url)
         >>> fighter = fighter_scraper._scrape_fighter()
         """
 
         self._soup = None
-        self._incorrect_urls = get_incorrect_urls()
+        self._incorrect_urls = incorrect_urls
         self._fighter_url = self._set_fighter_url(fighter_url)
 
     def _set_fighter_url(self, fighter_url: str) -> str:
