@@ -5,15 +5,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="ufc_data_scraper",
-    version="0.9.64",
+    version="0.9.65",
     author="Kyle Leben",
     author_email="leben.kyle.hex@gmail.com",
     description="A simple webscraping library, focused on the UFC website",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://gitlab.com/HeXeDMinD/ufc-data-scraper",
+    url="https://github.com/HeXeDMinD/ufc-data-scraper",
     project_urls={
-        "Bug Tracker": "https://gitlab.com/HeXeDMinD/ufc-data-scraper/issues"
+        "Bug Tracker": "https://github.com/HeXeDMinD/ufc-data-scraper/issues"
     },
     license="MIT",
     packages=[

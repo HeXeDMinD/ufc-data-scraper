@@ -1,3 +1,5 @@
+import os
+import json
 import pytz
 import requests
 
@@ -23,21 +25,52 @@ def convert_date(date: str) -> datetime:
     return date_obj
 
 
-def get_incorrect_urls() -> dict:
-    """Queries a google web app for up to date list of incorrect fighter urls.
+def fetch_latest_urls(full_path: str) -> dict:
+    data_url = "https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
 
-    Returns:
-        dict: Dictionary of incorrect fighter urls with their correct counterpart.
-    """
-
-    google_web_app = f"https://script.google.com/macros/s/AKfycbzYJ7dC6Xg4MSKVg7XWI5yz32Gc97ePNQnRkPs9vDz21KRD7IjFnF938aUlsouKrRy5/exec"
-
-    site_response = requests.get(google_web_app)
+    site_response = requests.get(data_url)
 
     if site_response.status_code != 200:
         return None
 
-    return {
+    latest_urls = {
         incorrect.lower(): correct.lower()
         for incorrect, correct in site_response.json().items()
     }
+
+    json_data = {"last_fetched": datetime.now().strftime(
+        "%Y-%m-%d %H:%M")} | {"incorrect_urls": latest_urls}
+    json_dump = json.dumps(json_data, indent=4)
+
+    with open(full_path, "w", encoding="utf-8") as file:
+        file.write(json_dump)
+
+    return latest_urls
+
+
+def should_fetch_latest(last_fetched: str):
+    time_delta = datetime.now() - datetime.strptime(last_fetched,
+                                                    "%Y-%m-%d %H:%M")
+    time_delta_in_hours = time_delta.total_seconds() / 3600
+    return time_delta_in_hours > 1
+
+
+def get_incorrect_urls():
+    filename = "incorrect_urls.json"
+    file_path = "ufc_data_scraper/data"
+    full_path = f"{file_path}/{filename}"
+
+    if os.path.exists(full_path):
+        with open(full_path, "r", encoding="utf-8") as file:
+            file_data = json.load(file)
+
+        if should_fetch_latest(file_data.get("last_fetched")):
+            incorrect_urls = fetch_latest_urls(full_path)
+        else:
+            incorrect_urls = file_data.get("incorrect_urls")
+    else:
+        if not os.path.isdir(file_path):
+            os.mkdir(file_path)
+        incorrect_urls = fetch_latest_urls(full_path)
+
+    return incorrect_urls
