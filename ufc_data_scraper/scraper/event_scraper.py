@@ -389,7 +389,7 @@ class EventScraper:
                     fights=[parsed_fight],
                 )
 
-        return card_segments
+        return list(card_segments.values())
 
     def scrape_event(self) -> Event:
         """Queries private UFC api and returns query as an Event object.
