@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from ufc_data_scraper.data_models.fighter.strike_position import StrikePosition
 from ufc_data_scraper.data_models.fighter.strike_target import StrikeTarget
+from ufc_data_scraper.data_models.fighter.strike_position import StrikePosition
 
 
 @dataclass(frozen=True, order=True)
@@ -13,5 +13,5 @@ class Striking:
     strikes_absorbed_average: float
     striking_defence: int
     knockdown_average: float
-    strike_position: StrikePosition
     strike_target: StrikeTarget
+    strike_position: StrikePosition
