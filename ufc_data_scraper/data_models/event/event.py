@@ -12,4 +12,4 @@ class Event:
     date: datetime
     status: str
     location: Location
-    card_segments: dict
+    card_segments: list
