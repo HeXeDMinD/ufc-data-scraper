@@ -392,7 +392,7 @@ class TestEventScraper:
         )
 
         actual = (
-            self.test_event.card_segments["Main"].fights[0].fighters_stats[0].__dict__
+            self.test_event.card_segments[0].fights[0].fighters_stats[0].__dict__
         )
 
         for key, value in expected.__dict__.items():
@@ -411,7 +411,8 @@ class TestEventScraper:
             performance_of_the_night=False,
         )
 
-        actual = self.test_event_scraper._get_fighters_stats(self.test_fighter).__dict__
+        actual = self.test_event_scraper._get_fighters_stats(
+            self.test_fighter).__dict__
 
         for key, value in expected.__dict__.items():
             if key == "fighter":
@@ -444,7 +445,8 @@ class TestEventScraper:
             fight_of_the_night=False,
         )
 
-        actual = self.test_event_scraper._get_result_obj(self.test_fight_1).__dict__
+        actual = self.test_event_scraper._get_result_obj(
+            self.test_fight_1).__dict__
 
         for key, value in expected.__dict__.items():
             assert actual[key] == value
@@ -462,7 +464,8 @@ class TestEventScraper:
             fight_of_the_night=False,
         )
 
-        actual = self.test_event_scraper._get_result_obj(self.test_fight_2).__dict__
+        actual = self.test_event_scraper._get_result_obj(
+            self.test_fight_2).__dict__
 
         for key, value in expected.__dict__.items():
             assert actual[key] == value
@@ -498,9 +501,11 @@ class TestEventScraper:
         assert actual == expected
 
     def test_get_accolades_obj_fight_2(self):
-        expected = Accolade(description="UFC Light Heavyweight Title", type="Belt")
+        expected = Accolade(
+            description="UFC Light Heavyweight Title", type="Belt")
 
-        actual = self.test_event_scraper._get_accolades_obj(self.test_fight_2).__dict__
+        actual = self.test_event_scraper._get_accolades_obj(
+            self.test_fight_2).__dict__
 
         for key, value in expected.__dict__.items():
             assert actual[key] == value
@@ -508,7 +513,8 @@ class TestEventScraper:
     def test_get_rule_set_obj_fight_1(self):
         expected = RuleSet(description="3 Rnd (5-5-5)", possible_rounds=3)
 
-        actual = self.test_event_scraper._get_rule_set_obj(self.test_fight_1).__dict__
+        actual = self.test_event_scraper._get_rule_set_obj(
+            self.test_fight_1).__dict__
 
         for key, value in expected.__dict__.items():
             assert actual[key] == value
@@ -516,13 +522,14 @@ class TestEventScraper:
     def test_get_rule_set_obj_fight_2(self):
         expected = RuleSet(description="5 Rnd (5-5-5-5-5)", possible_rounds=5)
 
-        actual = self.test_event_scraper._get_rule_set_obj(self.test_fight_2).__dict__
+        actual = self.test_event_scraper._get_rule_set_obj(
+            self.test_fight_2).__dict__
 
         for key, value in expected.__dict__.items():
             assert actual[key] == value
 
     def test_get_card_segments_type(self):
-        expected = dict
+        expected = list
         actual = self.test_event.card_segments
 
         assert type(actual) == expected
@@ -537,19 +544,20 @@ class TestEventScraper:
         expected = ["Main", "Prelims1", "Prelims2"]
         actual = self.test_event.card_segments
 
-        for key in expected:
-            assert actual[key].name == key
+        for i, segment in enumerate(actual):
+            assert segment.name == expected[i]
 
     def test_get_card_segments_start_times(self):
-        expected = ["2022-12-11T03:00Z", "2022-12-11T01:00Z", "2022-12-10T23:30Z"]
+        expected = ["2022-12-11T03:00Z",
+                    "2022-12-11T01:00Z", "2022-12-10T23:30Z"]
         actual = self.test_event.card_segments
 
-        for i, segment in enumerate(actual.keys()):
-            assert actual[segment].start_time == convert_date(expected[i])
+        for i, segment in enumerate(actual):
+            assert segment.start_time == convert_date(expected[i])
 
     def test_get_card_segments_broadcasters(self):
         expected = ["PPV", "ESPN 2", "UFC Fight Pass"]
         actual = self.test_event.card_segments
 
-        for i, segment in enumerate(actual.keys()):
-            assert actual[segment].broadcaster == expected[i]
+        for i, segment in enumerate(actual):
+            assert segment.broadcaster == expected[i]
