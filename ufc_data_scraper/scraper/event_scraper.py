@@ -362,11 +362,11 @@ class EventScraper:
 
         return fight
 
-    def _get_card_segments(self) -> dict:
-        """Parse each card segment in event data, convert each into a CardSegment objects and return them as a dict.
+    def _get_card_segments(self) -> list:
+        """Parse each card segment in event data, convert each into a CardSegment objects and return them as a list.
 
         Returns:
-            dict: Dictionary of card segements. name: CardSegment
+            list: List of card segments.
         """
 
         fight_card = self._event_data.get("FightCard")
