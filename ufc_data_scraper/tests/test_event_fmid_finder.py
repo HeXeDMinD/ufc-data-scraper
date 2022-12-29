@@ -43,7 +43,7 @@ class TestEventFmidFinder:
         expected = list
         actual = _get_event_urls(test_page_num)
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_get_event_urls_length(self):
         # test whether function actually returns urls.
@@ -57,7 +57,7 @@ class TestEventFmidFinder:
         expected = int
         actual = _get_last_fmid()
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_get_last_fmid(self):
         # test whether function actually returns an fmid.
@@ -71,7 +71,7 @@ class TestEventFmidFinder:
         expected = dict
         actual = _get_event_data(test_fmid)
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_get_event_data(self):
         # test whether function actually returns data.
@@ -103,7 +103,7 @@ class TestEventFmidFinder:
         expected = datetime
         actual = _convert_scraped_date(test_date)
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_convert_scraped_date(self):
         test_date = "Sat, Dec 10 / 10:00 PM EST"

@@ -532,7 +532,7 @@ class TestEventScraper:
         expected = list
         actual = self.test_event.card_segments
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_get_card_segments_length(self):
         expected = 3

@@ -11,7 +11,7 @@ class TestUtils:
         expected = datetime
         actual = convert_date(test_start_time)
 
-        assert type(actual) == expected
+        assert isinstance(actual, expected)
 
     def test_convert_date(self):
         test_start_time = "2022-12-10T23:30Z"
