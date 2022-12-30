@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from ufc_data_scraper.data_models.base import Base
+
 
 @dataclass(frozen=True, order=True)
-class Grappling:
+class Grappling(Base):
     takedown_accuracy: int
     takedowns_landed: int
     takedowns_attempted: int

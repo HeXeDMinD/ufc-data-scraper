@@ -17,12 +17,16 @@ Easily scrape a fighters page and get a more convenient Fighter dataclass to wor
 
     'Fighter'
     
-or convert that Fighter or any other related dataclass into a dictionary using asdict.
+or convert that Fighter or any other related dataclass into a dictionary using as_dict method.
 
-    >>> from dataclasses import asdict
-    >>> fighter_dict = asdict(fighter)
-    >>> fighter_record_dict = asdict(fighter.record)
-    
+    >>> fighter_dict = fighter.as_dict()
+    >>> fighter_record_dict = fighter.record.as_dict()
+
+or convert that Fighter or any other related dataclass into a json using as_json method.
+
+    >>> fighter_json = fighter.as_json()
+    >>> fighter_record_json = fighter.record.as_json()
+
 ## Get event FMID
 
 Find internal event id(fmid) using only the event page url. This can be used to get event data directly.
@@ -62,12 +66,16 @@ or leave it to the library to figure out.
     'Event'
 
 
-or convert that Event or any other related dataclass into a dictionary using asdict.
+or convert that Event or any other related dataclass into a dictionary using as_dict method.
 
-    >>> from dataclasses import asdict
-    >>> event_dict = asdict(event)
-    >>> event_location_dict = asdict(event.location)
-    
+    >>> event_dict = event.as_dict()
+    >>> event_location_dict = event.location.as_dict()
+
+or convert that Event or any other related dataclass into a json using as_json method.
+
+    >>> event_dict = event.as_json()
+    >>> event_location_dict = event.location.as_json()
+
 ## Installing Ufc Data Scraper
 
 Requests is currently only available from git:

@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
 from ufc_data_scraper.data_models.fighter.fighter import Fighter
+from ufc_data_scraper.data_models.base import Base
 
 
 @dataclass(frozen=True, order=True)
-class FighterStats:
+class FighterStats(Base):
     fighter: Fighter
     corner: str
     weigh_in: float

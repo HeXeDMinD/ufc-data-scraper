@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from ufc_data_scraper.data_models.base import Base
+
 
 @dataclass(frozen=True, order=True)
-class WinMethod:
+class WinMethod(Base):
     knockout: int
     knockout_per: int
     decision: int
