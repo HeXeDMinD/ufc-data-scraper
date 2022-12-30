@@ -7,4 +7,4 @@ class Base:
         return asdict(self)
     
     def as_json(self):
-        return dumps(self.as_dict())
+        return dumps(self.as_dict(), default=str)
