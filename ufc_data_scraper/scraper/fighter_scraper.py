@@ -98,8 +98,7 @@ class FighterScraper:
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
             if label == "Status":
-                status = target.find(
-                    "div", class_="c-bio__text").get_text().strip()
+                status = target.find("div", class_="c-bio__text").get_text().strip()
                 break
 
         return status
@@ -189,8 +188,7 @@ class FighterScraper:
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
             if label == "Trains at":
-                gym = target.find(
-                    "div", class_="c-bio__text").get_text().strip()
+                gym = target.find("div", class_="c-bio__text").get_text().strip()
                 break
 
         return gym
@@ -246,8 +244,7 @@ class FighterScraper:
             "div", class_="c-stat-compare__group c-stat-compare__group-2"
         )
         for target in targets:
-            label = target.find(
-                "div", class_="c-stat-compare__label").get_text()
+            label = target.find("div", class_="c-stat-compare__label").get_text()
             if label == "Average fight time":
                 time = target.find("div", class_="c-stat-compare__number")
                 if time:
@@ -315,8 +312,7 @@ class FighterScraper:
             for i, name in enumerate(field_names):
                 if label == name:
                     field_value = (
-                        target.find(
-                            "div", class_="c-bio__text").get_text().strip()
+                        target.find("div", class_="c-bio__text").get_text().strip()
                     )
                     if field_value:
                         if name != "Age":
@@ -569,8 +565,7 @@ class FighterScraper:
                 )
 
                 text_split = (
-                    tag.find(
-                        "div", class_="c-stat-3bar__value").get_text().split("(")
+                    tag.find("div", class_="c-stat-3bar__value").get_text().split("(")
                 )
                 try:
                     value = int(text_split[0].strip())
@@ -609,8 +604,7 @@ class FighterScraper:
                 label = label.get_text().strip()
                 for key in dict_keys:
                     if label == key:
-                        value = target.find(
-                            "div", class_="c-stat-compare__number")
+                        value = target.find("div", class_="c-stat-compare__number")
                         if value and value.get_text() != "":
                             value = value.get_text().replace("%", "")
                             stats[key] = value.strip()

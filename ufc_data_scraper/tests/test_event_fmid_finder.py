@@ -107,8 +107,11 @@ class TestEventFmidFinder:
 
     def test_convert_scraped_date(self):
         test_date = "Sat, Dec 10 / 10:00 PM EST"
+        # Use current year since this is only used for upcoming events
+        date_now = datetime.now()
+        year = date_now.year
         expected = datetime(
-            year=2022, month=12, day=11, hour=3, minute=0, tzinfo=pytz.timezone("GMT")
+            year=year, month=12, day=11, hour=3, minute=0, tzinfo=pytz.timezone("GMT")
         )
         actual = _convert_scraped_date(test_date)
 

@@ -72,8 +72,7 @@ class EventScraper:
         location_data = self._event_data.get("Location")
 
         keys = ["Venue", "City", "Country", "TriCode"]
-        location_data = {
-            key.lower(): location_data[key] or "TBD" for key in keys}
+        location_data = {key.lower(): location_data[key] or "TBD" for key in keys}
 
         return Location(**location_data)
 
@@ -172,8 +171,7 @@ class EventScraper:
         """
 
         try:
-            figher_scraper = FighterScraper(
-                fighter_url, self._incorrect_fighter_urls)
+            figher_scraper = FighterScraper(fighter_url, self._incorrect_fighter_urls)
             fighter = figher_scraper.scrape_fighter()
         except requests.exceptions.HTTPError:
             fighter = None

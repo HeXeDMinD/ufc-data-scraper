@@ -76,7 +76,7 @@ def _get_last_fmid() -> int:
         if not current_fmid:
             continue
 
-        if last_fmid == None or current_fmid > last_fmid:
+        if last_fmid is None or current_fmid > last_fmid:
             last_fmid = current_fmid
 
     return int(last_fmid)
@@ -133,6 +133,7 @@ def _convert_scraped_date(date: str) -> datetime:
         datetime: Datetime object of supplied string, localized to GMT.
     """
 
+    # Website does not provide year; use current year
     date_now = datetime.now()
     year = date_now.year
 
@@ -144,7 +145,8 @@ def _convert_scraped_date(date: str) -> datetime:
 
     date_time_obj = datetime.strptime(date, "%Y %b %d / %I:%M %p")
 
-    # Check for wrap around and match years.
+    # Check for wrap around and match years
+    # Since this is only used for upcoming events we don't need to roll back
     if date_time_obj.month < date_now.month:
         date_time_obj += timedelta(days=365)
 

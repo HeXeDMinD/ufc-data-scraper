@@ -22,7 +22,7 @@ class TestUtils:
 
         assert actual == expected
 
-    def test__convert_date_missing_date(self):
+    def test_convert_date_missing_date(self):
         test_start_time = ""
         expected = None
         actual = convert_date(test_start_time)
