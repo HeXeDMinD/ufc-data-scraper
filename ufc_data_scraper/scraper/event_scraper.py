@@ -60,6 +60,7 @@ class EventScraper:
                 for fighter_url in self._fighter_urls
             ]
             fighters = [future.result() for future in futures]
+
         return dict(zip(self._fighter_urls, fighters))
 
     def _get_location_obj(self) -> Location:
@@ -95,6 +96,7 @@ class EventScraper:
             fighter_name = first_name
         else:
             fighter_name = f"{first_name} {last_name}"
+
         return fighter_name
 
     def _get_fight_scores(self, fight: dict) -> list:
@@ -339,6 +341,7 @@ class EventScraper:
         referee_name = self._get_referee_name(fight)
 
         fighters_stats = self._parse_fighters(fight)
+
         result_obj = self._get_result_obj(fight)
 
         weight_class_obj = self._get_weight_class_obj(fight)
