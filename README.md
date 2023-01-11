@@ -207,9 +207,9 @@ Requests is currently only available from git:
 - **rule_set**  *- (RuleSet object)* [RuleSet object](#ruleset-object)
 - **fight_scores**  *- (list)* A list of [FightScore objects](#fightscore-object)
 
-#### Result Object
--  **fighter**  *- (Fighter object)* [Fighter  object](#fighter-object)
--  **corner** *- (int)* 
+#### FighterStats Object
+- **fighter** *- (Fighter object)* [Fighter  object](#fighter-object)
+- **corner** *- (int)* 
 - **weigh_in** *- (float)* 
 - **outcome** *- (str)* 
 - **ko_of_the_night** *- (bool)* 
@@ -217,8 +217,8 @@ Requests is currently only available from git:
 - **performance_of_the_night** *- (bool)* 
 
 #### Result Object
--  **method**  *- (str)* 
--  **ending_round** *- (int)* 
+- **method** *- (str)* 
+- **ending_round** *- (int)* 
 - **ending_time** *- (str)* 
 - **ending_strike** *- (str)* 
 - **ending_target** *- (str)* 
