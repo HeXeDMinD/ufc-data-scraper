@@ -37,7 +37,7 @@ Find internal event id(fmid) using only the event page url. This can be used to 
 
     >>> event_fmid = ufc_scraper.get_event_fmid(event_url)
 
-    >>> type(event)
+    >>> event_fmid
 
     1124
 
