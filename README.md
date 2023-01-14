@@ -3,6 +3,15 @@
 # UFC Data Scraper
 
 **UFC Data Scraper** is a simple webscraping library.
+
+
+## Installing UFC Data Scraper
+
+UFC Data Scraper is currently only available from git:
+
+    $ python -m pip install git+https://github.com/HeXeDMinD/ufc-data-scraper.git
+
+
 ## Scrape fighter pages
 
 Easily scrape a fighters page and get a more convenient Fighter dataclass to work with.
@@ -75,12 +84,6 @@ or convert that Event or any other related dataclass into a json using as_json m
 
     >>> event_dict = event.as_json()
     >>> event_location_dict = event.location.as_json()
-
-## Installing Ufc Data Scraper
-
-Requests is currently only available from git:
-
-    $ python -m pip install git+https://github.com/HeXeDMinD/ufc-data-scraper.git
 
 ## Fighter Object
 
