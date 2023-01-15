@@ -21,7 +21,7 @@ def _page_is_valid(soup: BeautifulSoup) -> bool:
     return soup.find("h3") and True or False
 
 
-def _get_event_urls(page_num: int) -> list:
+def get_event_urls(page_num: int) -> list:
     """Queries events with page_num and adds event urls to list.
 
     Args:
@@ -68,7 +68,7 @@ def _get_last_fmid() -> int:
 
     last_fmid = None
 
-    recent_events = _get_event_urls(page_num=0)
+    recent_events = get_event_urls(page_num=0)
 
     for event_url in recent_events:
         current_fmid = _scrape_event_fmid(event_url)

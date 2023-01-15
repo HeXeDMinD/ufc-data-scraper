@@ -6,7 +6,7 @@ from datetime import datetime
 
 from ufc_data_scraper.scraper.fmid_finder import (
     _page_is_valid,
-    _get_event_urls,
+    get_event_urls,
     _get_last_fmid,
     _get_event_data,
     _get_event_date,
@@ -41,7 +41,7 @@ class TestEventFmidFinder:
     def test_get_event_urls_type(self):
         test_page_num = 0
         expected = list
-        actual = _get_event_urls(test_page_num)
+        actual = get_event_urls(test_page_num)
 
         assert isinstance(actual, expected)
 
@@ -49,7 +49,7 @@ class TestEventFmidFinder:
         # test whether function actually returns urls.
         test_page_num = 0
         expected = 0
-        actual = _get_event_urls(test_page_num)
+        actual = get_event_urls(test_page_num)
 
         assert len(actual) > expected
 
