@@ -195,10 +195,11 @@ class EventScraper:
         try:
             fighter_obj = self._scraped_fighters[fighter_url]
         except KeyError:
-            fighter_obj = fighter_url
+            fighter_obj = None
 
         fighter_stats_data = {
             "fighter": fighter_obj,
+            "fighter_url": fighter_url,
             "corner": fighter.get("Corner"),
             "weigh_in": fighter.get("WeighIn"),
             "outcome": fighter.get("Outcome").get("Outcome") or "TBD",
@@ -208,7 +209,7 @@ class EventScraper:
         }
 
         fighters_stats = FighterStats(**fighter_stats_data)
-
+            
         return fighters_stats
 
     def _parse_fighters(self, fight: dict) -> list:

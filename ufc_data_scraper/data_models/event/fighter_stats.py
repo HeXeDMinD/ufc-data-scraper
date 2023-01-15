@@ -7,6 +7,7 @@ from ufc_data_scraper.data_models.base import Base
 @dataclass(frozen=True, order=True)
 class FighterStats(Base):
     fighter: Fighter
+    fighter_url: str
     corner: str
     weigh_in: float
     outcome: str

@@ -383,6 +383,7 @@ class TestEventScraper:
     def test_get_fighters_stats(self):
         expected = FighterStats(
             fighter=None,
+            fighter_url="http://www.ufc.com/athlete/jan-blachowicz",
             corner="Red",
             weigh_in=204.5,
             outcome="Draw",
@@ -401,6 +402,7 @@ class TestEventScraper:
     def test_get_fighters_stats_test_fighter(self):
         expected = FighterStats(
             fighter=None,
+            fighter_url="http://www.ufc.com/athlete/bryce-mitchell",
             corner="Red",
             weigh_in=146.0,
             outcome="Loss",
