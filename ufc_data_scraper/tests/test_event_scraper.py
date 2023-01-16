@@ -7,8 +7,8 @@ from ufc_data_scraper.utils import convert_date
 
 class TestEventScraper:
     test_fmid = 1124  # Completed Event
-
-    test_event_scraper = EventScraper(1124)
+    test_url = "https://www.ufc.com/event/ufc-282"
+    test_event_scraper = EventScraper(test_fmid, test_url)
     test_event = test_event_scraper.scrape_event()
 
     test_fight_1 = {
@@ -282,7 +282,8 @@ class TestEventScraper:
 
     def test_scraped_event(self):
         expected = {
-            "fmid": 1124,
+            "fmid": self.test_fmid,
+            "event_url": self.test_url,
             "name": "UFC 282: Blachowicz vs. Ankalaev",
             "date": convert_date("2022-12-10T23:30Z"),
             "status": "Final",
@@ -310,7 +311,7 @@ class TestEventScraper:
             "http://www.ufc.com/athlete/dricus-du-plessis",
             "http://www.ufc.com/athlete/bryce-mitchell",
             "http://www.ufc.com/athlete/ilia-topuria",
-            "http://www.ufc.com/athlete/raul-rosas-jr.",
+            "http://www.ufc.com/athlete/raul-rosas-jr",
             "http://www.ufc.com/athlete/jay-perrin",
             "http://www.ufc.com/athlete/jairzinho-rozenstruik",
             "http://www.ufc.com/athlete/chris-daukaus",

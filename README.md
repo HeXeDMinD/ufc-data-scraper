@@ -181,8 +181,9 @@ or convert that Event or any other related dataclass into a json using as_json m
 
 ## Event Object
 
--  **fmid**  *- (int)* Events internal ID, used by private UFC api.
--  **name** *- (str)* Event name.
+- **fmid**  *- (int)* Events internal ID, used by private UFC api.
+- **event_url** *- (str)* Event page url.
+- **name** *- (str)* Event name.
 - **date** *- (datetime)* Event date, localised to GMT.
 - **status** *- (str)* Events status. i.e "Upcoming"
 - **location**  *- (Location object)* [Location object](#location-object)
@@ -212,9 +213,10 @@ or convert that Event or any other related dataclass into a json using as_json m
 
 #### FighterStats Object
 - **fighter** *- (Fighter object)* [Fighter  object](#fighter-object)
-- **corner** *- (int)* 
-- **weigh_in** *- (float)* 
-- **outcome** *- (str)* 
+- **fighter_url** *- (str)* Fighter page url.
+- **corner** *- (int)* Colour of fighters corner.
+- **weigh_in** *- (float)* Weight the fighter weighed in at.
+- **outcome** *- (str)* Fight outcome for fighter.
 - **ko_of_the_night** *- (bool)* 
 - **submission_of_the_night** *- (bool)* 
 - **performance_of_the_night** *- (bool)* 

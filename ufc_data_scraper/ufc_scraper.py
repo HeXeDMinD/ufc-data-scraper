@@ -34,7 +34,7 @@ def scrape_event_url(event_url: str) -> Event:
 
     event_fmid = get_event_fmid(event_url)
 
-    event_scraper = EventScraper(event_fmid)
+    event_scraper = EventScraper(event_fmid, event_url)
 
     return event_scraper.scrape_event()
 

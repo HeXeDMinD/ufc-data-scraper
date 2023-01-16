@@ -8,11 +8,37 @@ from ufc_data_scraper.utils import *
 
 from ufc_data_scraper.data_models.fighter import *
 
+    
+def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
+    """Replaces incorrect urls and removes inconsistancies from url.
+
+    Args:
+        fighter_url (str): UFC fighter page url.
+        incorrect_urls (dict): Dictionary of incorrect urls with their corrected counterpart.
+        
+    Returns:
+        str: Corrected fighter url.
+    """
+
+    # Remove any strange chars from fighter name
+    url_name = fighter_url.split("/")[-1].lower()
+    
+    banned_url_chars = ["--", "'", "."]
+    for banned_char in banned_url_chars:
+        if banned_char in url_name:
+            url_name = url_name.replace(banned_char, "")
+    fighter_url = f"http://www.ufc.com/athlete/{url_name}"
+    fighter_url = unidecode(fighter_url)
+    
+    try:
+        fighter_url = incorrect_urls[fighter_url]
+    except (KeyError, TypeError):
+        fighter_url = fighter_url
+
+    return fighter_url
 
 class FighterScraper:
-    def __init__(
-        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()
-    ) -> None:
+    def __init__(self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
         Args:
@@ -24,33 +50,7 @@ class FighterScraper:
         """
 
         self._soup = None
-        self._incorrect_urls = incorrect_urls
-        self._fighter_url = self._set_fighter_url(fighter_url)
-
-    def _set_fighter_url(self, fighter_url: str) -> str:
-        """Replaces incorrect urls and removes inconsistancies from url.
-
-        Args:
-            fighter_url (str): UFC fighter page url.
-
-        Returns:
-            str: Corrected fighter url.
-        """
-
-        # Remove any strange chars from fighter name
-        url_name = fighter_url.split("/")[-1].lower()
-        banned_url_chars = ["--", "'", "."]
-        for banned_char in banned_url_chars:
-            if banned_char in url_name:
-                url_name = url_name.replace(banned_char, "")
-        fighter_url = f"http://www.ufc.com/athlete/{url_name}"
-        
-        try:
-            fighter_url = self._incorrect_urls[fighter_url]
-        except (KeyError, TypeError):
-            fighter_url = fighter_url
-
-        return unidecode(fighter_url)
+        self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
 
     def _get_name(self) -> str:
         """Gets fighter name.
@@ -621,7 +621,7 @@ class FighterScraper:
             Fighter: Fighter object containing fighter's data.
         """
 
-        url_response = requests.get(self._fighter_url)
+        url_response = requests.get(self.fighter_url)
 
         url_response.raise_for_status()
 
@@ -667,7 +667,7 @@ class FighterScraper:
         grappling_obj = self._get_grappling_obj(stats_targets)
 
         fighter_data = {
-            "fighter_url": self._fighter_url,
+            "fighter_url": self.fighter_url,
             "name": name,
             "nickname": nickname,
             "status": status,

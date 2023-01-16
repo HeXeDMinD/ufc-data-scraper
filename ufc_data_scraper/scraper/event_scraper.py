@@ -1,7 +1,7 @@
 import requests
 import concurrent.futures
 
-from ufc_data_scraper.scraper.fighter_scraper import FighterScraper
+from ufc_data_scraper.scraper.fighter_scraper import FighterScraper, set_fighter_url
 
 from ufc_data_scraper.data_models.event import *
 from ufc_data_scraper.data_models.fighter import Fighter
@@ -10,20 +10,22 @@ from ufc_data_scraper.utils import convert_date, get_incorrect_urls
 
 
 class EventScraper:
-    def __init__(self, event_fmid: int) -> None:
+    def __init__(self, event_fmid: int, event_url=None) -> None:
         """Queries private UFC api and returns query as an Event object.
 
         Args:
             event_fmid (int): Event FMID, to query.
+            event_url (str, optional): If supplied will add event page url to Event data class. Defaults to None.
 
-        >>> event_scraper = _EventScraper(event_fmid)
-        >>> event = event_scraper._scrape_event()
+        >>> event_scraper = EventScraper(event_fmid, event_url)
+        >>> event = event_scraper.scrape_event()
         """
 
         self._event_fmid = event_fmid
+        self._event_url = event_url
         self._event_data = self._get_event_data()
-        self._fighter_urls = self._get_fighter_urls()
         self._incorrect_fighter_urls = get_incorrect_urls()
+        self._fighter_urls = self._get_fighter_urls()
         self._scraped_fighters = self._scrape_fighters()
 
     def _get_event_data(self) -> dict:
@@ -46,7 +48,7 @@ class EventScraper:
         for fight in self._event_data.get("FightCard"):
             for fighter in fight.get("Fighters"):
                 url = self._get_fighter_url(fighter)
-                fighter_urls.append(url.lower())
+                fighter_urls.append(url)
 
         return fighter_urls
 
@@ -153,14 +155,14 @@ class EventScraper:
         """
 
         fighter_url = fighter.get("UFCLink")
-
+        
         if not fighter_url:
             fighter_name = self._get_fighter_name(fighter)
             fighter_url = (
                 f"https://www.ufc.com/athlete/{fighter_name.replace(' ', '-')}"
             )
 
-        return fighter_url.lower()
+        return set_fighter_url(fighter_url, self._incorrect_fighter_urls)
 
     def _get_fighter_obj(self, fighter_url: str) -> Fighter:
         """Scrapes fighter data from fighter url and returns it as a Fighter object.
@@ -404,6 +406,7 @@ class EventScraper:
 
         event_info = {
             "fmid": self._event_fmid,
+            "event_url": self._event_url,
             "name": self._event_data.get("Name"),
             "date": convert_date(event_date),
             "status": self._event_data.get("Status"),

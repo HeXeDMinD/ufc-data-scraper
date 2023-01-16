@@ -1,54 +1,59 @@
-from ufc_data_scraper.scraper import FighterScraper
+from ufc_data_scraper.scraper.fighter_scraper import FighterScraper, set_fighter_url
+
+from ufc_data_scraper.utils import get_incorrect_urls
 
 from ufc_data_scraper.data_models.fighter import *
 
 
 class TestFighterScraper:
     test_url = "https://www.ufc.com/athlete/ali-alqaisi"  # Retired fighter
+    
+    incorrect_fighter_urls = get_incorrect_urls()
+    
+    test_fighter_scraper = FighterScraper(test_url, incorrect_fighter_urls)
 
-    test_fighter_scraper = FighterScraper(test_url)
     test_fighter = test_fighter_scraper.scrape_fighter()
 
     def test_set_fighter_url_lower_case(self):
         test_url = "http://www.ufc.com/athlete/Jan-Blachowicz"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
 
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
 
     def test_set_fighter_url_https(self):
         test_url = "https://www.ufc.com/athlete/jan-blachowicz"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
 
     def test_set_fighter_url_banned_chars(self):
         test_url = "http://www.ufc.com/athlete/jan-blachowicz--"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
 
     def test_set_fighter_url_banned_chars_2(self):
         test_url = "http://www.ufc.com/athlete/'jan-blachowicz"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
 
     def test_set_fighter_url_incorrect_url(self):
         test_url = "http://www.ufc.com/athlete/Raul-Rosas-Jr."
         expected = "http://www.ufc.com/athlete/raul-rosas-jr"
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
         
     def test_set_fighter_url_incorrect_url2(self):
         test_url = "http://www.ufc.com/athlete/Cristian-Quiñonez"
         expected = "https://www.ufc.com/athlete/trevin-dzhayls-6"
-        actual = self.test_fighter_scraper._set_fighter_url(test_url)
+        actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
         
