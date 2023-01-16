@@ -44,7 +44,14 @@ class TestFighterScraper:
         actual = self.test_fighter_scraper._set_fighter_url(test_url)
 
         assert actual == expected
+        
+    def test_set_fighter_url_incorrect_url2(self):
+        test_url = "http://www.ufc.com/athlete/Cristian-Quiñonez"
+        expected = "https://www.ufc.com/athlete/trevin-dzhayls-6"
+        actual = self.test_fighter_scraper._set_fighter_url(test_url)
 
+        assert actual == expected
+        
     def test_get_name(self):
         expected = "Ali Al Qaisi"
         actual = self.test_fighter_scraper._get_name()

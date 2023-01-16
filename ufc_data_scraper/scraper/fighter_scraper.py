@@ -37,21 +37,20 @@ class FighterScraper:
             str: Corrected fighter url.
         """
 
-        fighter_url = fighter_url.lower()
-
-        fighter_url = fighter_url.replace("https", "http")
-
-        banned_url_chars = ["--", "'"]
+        # Remove any strange chars from fighter name
+        url_name = fighter_url.split("/")[-1].lower()
+        banned_url_chars = ["--", "'", "."]
         for banned_char in banned_url_chars:
-            if banned_char in fighter_url:
-                fighter_url = fighter_url.replace(banned_char, "")
-
+            if banned_char in url_name:
+                url_name = url_name.replace(banned_char, "")
+        fighter_url = f"http://www.ufc.com/athlete/{url_name}"
+        
         try:
             fighter_url = self._incorrect_urls[fighter_url]
         except (KeyError, TypeError):
             fighter_url = fighter_url
 
-        return fighter_url
+        return unidecode(fighter_url)
 
     def _get_name(self) -> str:
         """Gets fighter name.
