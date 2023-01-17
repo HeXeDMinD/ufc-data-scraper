@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ufc_data_scraper"
-version = "0.9.895"
+version = "0.9.9"
 authors = [
   { name="Kyle Leben", email="leben.kyle.hex@gmail.com" },
 ]
@@ -30,5 +30,5 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["ufc_data_scraper*"]
-exclude = ["ufc_data_scraper.tests*", "ufc_data_scraper.data*"]
+exclude = ["ufc_data_scraper.tests", "ufc_data_scraper.data"]
 namespaces = false
