@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ufc_data_scraper"
-version = "0.9.892"
+version = "0.9.893"
 authors = [
   { name="Kyle Leben", email="leben.kyle.hex@gmail.com" },
 ]
@@ -28,4 +28,5 @@ dependencies = [
 "Bug Tracker" = "https://github.com/HeXeDMinD/ufc-data-scraper/issues"
 
 [tool.setuptools.packages.find]
-exclude = ["tests*", "data*"] 
+incude = ["ufc_data_scraper*"]
+exclude = ["ufc_data_scraper/tests", "ufc_data_scraper/data"] 
