@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ufc_data_scraper"
-version = "0.9.88e"
+version = "0.9.89"
 authors = [
   { name="Kyle Leben", email="leben.kyle.hex@gmail.com" },
 ]
