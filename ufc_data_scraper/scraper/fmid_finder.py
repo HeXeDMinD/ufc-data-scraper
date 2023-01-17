@@ -21,14 +21,14 @@ def _page_is_valid(soup: BeautifulSoup) -> bool:
     return soup.find("h3") and True or False
 
 
-def get_event_urls(page_num: int) -> list:
+def get_event_urls(page_num: int) -> list[str]:
     """Queries events with page_num and adds event urls to list.
 
     Args:
         page_num (int): Page number for query.
 
     Returns:
-        list: List of event urls returned from query.
+        list[str]: List of event urls returned from query.
     """
 
     page_query = {"page": page_num}

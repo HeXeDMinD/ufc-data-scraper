@@ -580,12 +580,12 @@ class FighterScraper:
 
         return stats
 
-    def _parse_result_set(self, result_set: ResultSet, dict_keys: list) -> dict:
+    def _parse_result_set(self, result_set: ResultSet, dict_keys: list[str]) -> dict:
         """Parses result set for supplied dictionary keys and returns them as a dictionary.
 
         Args:
             result_set (ResultSet): ResultSet object containing fighters striking and grappling information.
-            dict_keys (list): List of dicionary keys to find within result_set.
+            dict_keys (list[str]): List of dicionary keys to find within result_set.
 
         Returns:
             dict: Dictionary of requested information from ResultSet.

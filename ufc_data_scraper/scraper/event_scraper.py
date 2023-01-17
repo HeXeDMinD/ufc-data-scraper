@@ -42,7 +42,13 @@ class EventScraper:
 
         return event_response.json().get("LiveEventDetail")
 
-    def _get_fighter_urls(self) -> list:
+    def _get_fighter_urls(self) -> list[str]:
+        """Gets fighter urls from event data.
+
+        Returns:
+            list[str]: List of fighter urls.
+        """
+        
         fighter_urls = []
 
         for fight in self._event_data.get("FightCard"):
@@ -53,6 +59,12 @@ class EventScraper:
         return fighter_urls
 
     def _scrape_fighters(self) -> dict:
+        """Scrapes fighters and returns them in a dictionary.
+
+        Returns:
+            dict: Dictionary of Fighter objects, using fighter url as a key.
+        """
+        
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             futures = [
                 executor.submit(
@@ -101,14 +113,14 @@ class EventScraper:
 
         return fighter_name
 
-    def _get_fight_scores(self, fight: dict) -> list:
+    def _get_fight_scores(self, fight: dict) -> list[FightScore]:
         """Get fight score information from fight dictionary convert each into a FightScore object and return them as a list.
 
         Args:
             fight (dict): Fight dictionary from event data.
 
         Returns:
-            list: List of FightScore objects.
+            list[FightScore]: List of FightScore objects.
         """
 
         fight_results = fight.get("Result")
@@ -214,14 +226,14 @@ class EventScraper:
             
         return fighters_stats
 
-    def _parse_fighters(self, fight: dict) -> list:
+    def _parse_fighters(self, fight: dict) -> list[FighterStats]:
         """Parse each fighter in fight dictionary, convert each into a FighterStats object and return them as a list.
 
         Args:
             fight (dict): Fight dictionary from event data.
 
         Returns:
-            list: List of FighterStats objects.
+            list[FighterStats]: List of FighterStats objects.
         """
 
         fighters = fight.get("Fighters")
@@ -366,11 +378,11 @@ class EventScraper:
 
         return fight
 
-    def _get_card_segments(self) -> list:
+    def _get_card_segments(self) -> list[CardSegment]:
         """Parse each card segment in event data, convert each into a CardSegment objects and return them as a list.
 
         Returns:
-            list: List of card segments.
+            list[CardSegment]: List of card segments.
         """
 
         fight_card = self._event_data.get("FightCard")
