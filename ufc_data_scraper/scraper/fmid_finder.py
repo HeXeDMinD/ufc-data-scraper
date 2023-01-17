@@ -208,7 +208,7 @@ def _brute_force_event_fmid(event_url: str) -> int:
         scraped_date = _convert_scraped_date(scraped_date)
         if scraped_date:
             api_date = convert_date(data["StartTime"])
-            if scraped_date - api_date <= timedelta(days=2):
+            if abs(scraped_date - api_date) <= timedelta(days=2):
                 return current_fmid
 
         current_fmid += 1
