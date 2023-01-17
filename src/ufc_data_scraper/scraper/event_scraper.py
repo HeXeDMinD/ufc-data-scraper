@@ -48,7 +48,7 @@ class EventScraper:
         Returns:
             list[str]: List of fighter urls.
         """
-        
+
         fighter_urls = []
 
         for fight in self._event_data.get("FightCard"):
@@ -64,7 +64,7 @@ class EventScraper:
         Returns:
             dict: Dictionary of Fighter objects, using fighter url as a key.
         """
-        
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             futures = [
                 executor.submit(
@@ -167,7 +167,7 @@ class EventScraper:
         """
 
         fighter_url = fighter.get("UFCLink")
-        
+
         if not fighter_url:
             fighter_name = self._get_fighter_name(fighter)
             fighter_url = (
@@ -223,7 +223,7 @@ class EventScraper:
         }
 
         fighters_stats = FighterStats(**fighter_stats_data)
-            
+
         return fighters_stats
 
     def _parse_fighters(self, fight: dict) -> list[FighterStats]:

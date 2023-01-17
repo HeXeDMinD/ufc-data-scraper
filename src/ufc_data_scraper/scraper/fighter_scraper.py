@@ -8,28 +8,28 @@ from ufc_data_scraper.utils import *
 
 from ufc_data_scraper.data_models.fighter import *
 
-    
+
 def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
     """Replaces incorrect urls and removes inconsistancies from url.
 
     Args:
         fighter_url (str): UFC fighter page url.
         incorrect_urls (dict): Dictionary of incorrect urls with their corrected counterpart.
-        
+
     Returns:
         str: Corrected fighter url.
     """
 
     # Remove any strange chars from fighter name
     url_name = fighter_url.split("/")[-1].lower()
-    
+
     banned_url_chars = ["--", "'", "."]
     for banned_char in banned_url_chars:
         if banned_char in url_name:
             url_name = url_name.replace(banned_char, "")
     fighter_url = f"http://www.ufc.com/athlete/{url_name}"
     fighter_url = unidecode(fighter_url)
-    
+
     try:
         fighter_url = incorrect_urls[fighter_url]
     except (KeyError, TypeError):
@@ -37,8 +37,11 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
 
     return fighter_url
 
+
 class FighterScraper:
-    def __init__(self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()) -> None:
+    def __init__(
+        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()
+    ) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
         Args:

@@ -7,9 +7,9 @@ from ufc_data_scraper.data_models.fighter import *
 
 class TestFighterScraper:
     test_url = "https://www.ufc.com/athlete/ali-alqaisi"  # Retired fighter
-    
+
     incorrect_fighter_urls = get_incorrect_urls()
-    
+
     test_fighter_scraper = FighterScraper(test_url, incorrect_fighter_urls)
 
     test_fighter = test_fighter_scraper.scrape_fighter()
@@ -49,14 +49,14 @@ class TestFighterScraper:
         actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
-        
+
     def test_set_fighter_url_incorrect_url2(self):
         test_url = "http://www.ufc.com/athlete/Cristian-Quiñonez"
         expected = "https://www.ufc.com/athlete/trevin-dzhayls-6"
         actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
-        
+
     def test_get_name(self):
         expected = "Ali Al Qaisi"
         actual = self.test_fighter_scraper._get_name()
