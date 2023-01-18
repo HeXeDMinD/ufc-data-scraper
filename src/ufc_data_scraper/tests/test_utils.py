@@ -31,6 +31,6 @@ class TestUtils:
 
     def test_get_incorrect_urls(self):
         actual = get_incorrect_urls()
-        
+
         assert actual is not None
         assert isinstance(actual, dict)

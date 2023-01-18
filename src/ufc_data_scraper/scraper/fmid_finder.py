@@ -1,4 +1,5 @@
 import json
+import concurrent.futures
 import requests
 import pytz
 
@@ -66,20 +67,20 @@ def _get_last_fmid() -> int:
         int: Latest FMID from queried event urls.
     """
 
-    last_fmid = None
-
     recent_events = get_event_urls(page_num=0)
 
-    for event_url in recent_events:
-        current_fmid = _scrape_event_fmid(event_url)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [
+            executor.submit(
+                _scrape_event_fmid,
+                requests.get(event_url),
+            )
+            for event_url in recent_events
+        ]
 
-        if not current_fmid:
-            continue
+    event_fmids = [future.result() for future in futures if future.result()]
 
-        if last_fmid is None or current_fmid > last_fmid:
-            last_fmid = current_fmid
-
-    return int(last_fmid)
+    return max(event_fmids)
 
 
 def _get_event_data(event_fmid: int) -> dict:
@@ -157,22 +158,21 @@ def _convert_scraped_date(date: str) -> datetime:
     return date_time_obj
 
 
-def _scrape_event_fmid(event_url: str) -> int:
-    """Gets event fmid from url, fmid can be used as API query.
+def _scrape_event_fmid(site_response: requests.Response) -> int:
+    """Gets event fmid from response, fmid can be used as API query.
 
     Args:
-        event_url (str): Event url to scrape for event fmid.
+        site_response (requests.Response): Url response to scrape for event fmid.
 
     Returns:
         int: Event FMID, can be used as API query or None if it cannot be scraped.
     """
 
-    site_response = requests.get(event_url)
-
-    site_response.raise_for_status()
+    if site_response.status_code != 200:
+        return None
 
     only_script = SoupStrainer("script", attrs={"type": "application/json"})
-    soup = BeautifulSoup(site_response.text, "html.parser", parse_only=only_script)
+    soup = BeautifulSoup(site_response.content, "html.parser", parse_only=only_script)
 
     site_scripts = json.loads(list(soup)[-1].text)
     try:
@@ -183,12 +183,18 @@ def _scrape_event_fmid(event_url: str) -> int:
     return fmid
 
 
-def _brute_force_event_fmid(event_url: str) -> int:
+def _brute_force_event_fmid(site_response: requests.Response) -> int:
     """Attempt to brute force guess the event fmid if it is not available from the event url.
+
+    Args:
+        site_response (requests.Response): Url response to guess fmid from.
 
     Returns:
         int: Event FMID, can be used as API query or None if it cannot be acquired.
     """
+
+    if site_response.status_code != 200:
+        return None
 
     current_fmid = _get_last_fmid() - 10
 
@@ -197,10 +203,6 @@ def _brute_force_event_fmid(event_url: str) -> int:
 
         if not data or (data and len(data) < 1):
             break
-
-        site_response = requests.get(event_url)
-
-        site_response.raise_for_status()
 
         soup = BeautifulSoup(site_response.content, "html.parser")
 
@@ -223,8 +225,11 @@ def get_event_fmid(event_url: str) -> int:
         int: Event FMID, can be used as API query.
     """
 
-    fmid = _scrape_event_fmid(event_url) or _brute_force_event_fmid(event_url)
-    if not fmid:
-        raise Exception(f"FMID could not be found for event url. {event_url}")
+    site_response = requests.get(event_url)
+
+    if site_response.status_code != 200:
+        return None
+
+    fmid = _scrape_event_fmid(site_response) or _brute_force_event_fmid(site_response)
 
     return fmid
