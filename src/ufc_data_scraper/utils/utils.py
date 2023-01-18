@@ -23,14 +23,14 @@ def convert_date(date: str) -> datetime:
     return date_obj
 
 
-def get_incorrect_urls() -> dict:
+def get_incorrect_urls() -> dict[str, str]:
     """Grabs latest incorrect urls from github file.
 
     Returns:
         dict: Dictionary of incorrect fighter urls with their correct counterpart.
     """
 
-    data_url = f"https://raw.githubusercontent.com/HeXeDMinD/ufc-data-scraper/main/ufc_data_scraper/data/incorrect_urls.json"
+    data_url = "https://raw.githubusercontent.com/HeXeDMinD/ufc-data-scraper/main/src/ufc_data_scraper/data/incorrect_urls.json"
 
     site_response = requests.get(data_url)
 

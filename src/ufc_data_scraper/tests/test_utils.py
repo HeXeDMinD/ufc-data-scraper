@@ -2,7 +2,7 @@ import pytz
 
 from datetime import datetime
 
-from ufc_data_scraper.utils import convert_date
+from ufc_data_scraper.utils import convert_date, get_incorrect_urls
 
 
 class TestUtils:
@@ -28,3 +28,9 @@ class TestUtils:
         actual = convert_date(test_start_time)
 
         assert actual == expected
+
+    def test_get_incorrect_urls(self):
+        actual = get_incorrect_urls()
+        
+        assert actual is not None
+        assert isinstance(actual, dict)
