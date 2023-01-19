@@ -184,17 +184,17 @@ class FighterScraper:
             str: Gym.
         """
 
-        gym = "Unlisted"
-
         targets = self._soup.find_all("div", class_="c-bio__field")
+        if not targets:
+            return "Unlisted"
+        
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
             if label == "Trains at":
-                gym = target.find("div", class_="c-bio__text").get_text().strip()
-                break
+                return target.find("div", class_="c-bio__text").get_text().strip()
 
-        return gym
-
+        return "Unlisted"
+    
     def _get_fighting_style(self) -> str:
         """Gets fighter's fighting style.
 

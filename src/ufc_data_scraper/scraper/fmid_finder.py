@@ -96,9 +96,12 @@ def _get_event_data(event_fmid: int) -> dict:
     events_endpoint = (
         f"http://d29dxerjsp82wz.cloudfront.net/api/v3/event/live/{event_fmid}.json"
     )
-    response_date = requests.get(events_endpoint)
+    site_response = requests.get(events_endpoint)
+    
+    if site_response.status_code != 200:
+        return None
 
-    return response_date.json().get("LiveEventDetail")
+    return site_response.json().get("LiveEventDetail")
 
 
 def _get_event_date(soup: BeautifulSoup) -> str:
@@ -158,11 +161,11 @@ def _convert_scraped_date(date: str) -> datetime:
     return date_time_obj
 
 
-def _scrape_event_fmid(site_response: requests.Response) -> int:
+def _scrape_event_fmid(site_response: requests.models.Response) -> int:
     """Gets event fmid from response, fmid can be used as API query.
 
     Args:
-        site_response (requests.Response): Url response to scrape for event fmid.
+        site_response (requests.models.Response): Url response to scrape for event fmid.
 
     Returns:
         int: Event FMID, can be used as API query or None if it cannot be scraped.
@@ -183,11 +186,11 @@ def _scrape_event_fmid(site_response: requests.Response) -> int:
     return fmid
 
 
-def _brute_force_event_fmid(site_response: requests.Response) -> int:
+def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
     """Attempt to brute force guess the event fmid if it is not available from the event url.
 
     Args:
-        site_response (requests.Response): Url response to guess fmid from.
+        site_response (requests.models.Response): Url response to guess fmid from.
 
     Returns:
         int: Event FMID, can be used as API query or None if it cannot be acquired.

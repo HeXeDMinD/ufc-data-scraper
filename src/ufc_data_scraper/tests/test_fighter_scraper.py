@@ -6,14 +6,18 @@ from ufc_data_scraper.data_models.fighter import *
 
 
 class TestFighterScraper:
-    test_url = "https://www.ufc.com/athlete/ali-alqaisi"  # Retired fighter
-
+    test_url_ali_alqaisi = "https://www.ufc.com/athlete/ali-alqaisi"  # Retired fighter
+    test_url_joseph_benevidez = "https://www.ufc.com/athlete/joseph-benavidez" # Retired fighter
+    
     incorrect_fighter_urls = get_incorrect_urls()
 
-    test_fighter_scraper = FighterScraper(test_url, incorrect_fighter_urls)
-
+    test_fighter_scraper = FighterScraper(test_url_ali_alqaisi, incorrect_fighter_urls)
     test_fighter = test_fighter_scraper.scrape_fighter()
-
+    
+    # Contains some data missing from test_fighter_scraper
+    test_fighter_scraper2 = FighterScraper(test_url_joseph_benevidez, incorrect_fighter_urls)
+    test_fighter_scraper2.scrape_fighter()
+    
     def test_set_fighter_url_lower_case(self):
         test_url = "http://www.ufc.com/athlete/Jan-Blachowicz"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
@@ -93,18 +97,30 @@ class TestFighterScraper:
 
         assert actual == expected
 
-    def _get_gym(self):
-        expected = "Unlisted"  # Could miss
+    def test_get_gym_unlisted(self):
+        expected = "Unlisted"
         actual = self.test_fighter_scraper._get_gym()
 
         assert actual == expected
+        
+    def test_get_gym_listed(self):
+        expected = "Team Alpha Male  (Urijah Faber's Ultimate Fitness)"
+        actual = self.test_fighter_scraper2._get_gym()
 
-    def test_get_fighting_style(self):
-        expected = "Unlisted"  # Could miss
+        assert actual == expected
+        
+    def test_get_fighting_style_unlisted(self):
+        expected = "Unlisted"
         actual = self.test_fighter_scraper._get_fighting_style()
 
         assert actual == expected
+        
+    def test_get_fighting_style_listed(self):
+        expected = "Jiu-Jitsu"
+        actual = self.test_fighter_scraper2._get_fighting_style()
 
+        assert actual == expected
+        
     def test_get_record_obj(self):
         expected = Record(win=8, loss=5, draw=0)
         actual = self.test_fighter_scraper._get_record_obj().__dict__
