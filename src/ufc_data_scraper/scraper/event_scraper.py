@@ -23,10 +23,10 @@ class EventScraper:
 
         self._event_fmid = event_fmid
         self._event_url = event_url
-        self._event_data = self._get_event_data()
-        self._incorrect_fighter_urls = get_incorrect_urls()
-        self._fighter_urls = self._get_fighter_urls()
-        self._scraped_fighters = self._scrape_fighters()
+        self._event_data = None
+        self._incorrect_fighter_urls = None
+        self._fighter_urls = None
+        self._scraped_fighters = None
 
     def _get_event_data(self) -> dict:
         """Returns event api response as dict.
@@ -414,6 +414,14 @@ class EventScraper:
             Event: Event object containing all data about queried event.
         """
 
+        self._event_data = self._get_event_data()
+        if not self._event_data:
+            return None
+        
+        self._incorrect_fighter_urls = get_incorrect_urls()
+        self._fighter_urls = self._get_fighter_urls()
+        self._scraped_fighters = self._scrape_fighters()
+        
         event_date = self._event_data.get("StartTime")
 
         event_info = {

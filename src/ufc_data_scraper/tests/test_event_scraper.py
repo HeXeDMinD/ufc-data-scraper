@@ -280,6 +280,16 @@ class TestEventScraper:
 
     test_fighter = test_fight_1.get("Fighters")[0]
 
+    def test_scrape_invalid_event(self):
+        invalid_fmid = 9999
+        invalid_url = "http://madeup.com/event/madeup-event"
+        expected = None
+        
+        test_event_scraper = EventScraper(invalid_fmid, invalid_url)
+        actual = test_event_scraper.scrape_event()
+        
+        assert actual == expected
+        
     def test_scraped_event(self):
         expected = {
             "fmid": self.test_fmid,
