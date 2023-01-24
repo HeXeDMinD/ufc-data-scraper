@@ -73,7 +73,8 @@ class EventScraper:
                 )
                 for fighter_url in self._fighter_urls
             ]
-            fighters = [future.result() for future in futures]
+
+        fighters = [future.result() for future in futures]
 
         return dict(zip(self._fighter_urls, fighters))
 
