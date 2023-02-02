@@ -71,6 +71,7 @@ class FighterScraper:
             name = target.get_text()
 
         name = name.replace("-", " ")
+        
         return unidecode(name.strip())
 
     def _get_nickname(self) -> str:
@@ -132,7 +133,7 @@ class FighterScraper:
                 else:
                     ranking = match.group()
 
-        return (ranking, pfp_ranking)
+        return ranking, pfp_ranking
 
     def _get_weightclass(self) -> str:
         """Gets fighter's weightclass.
@@ -177,7 +178,7 @@ class FighterScraper:
                     country = text.strip()
                 break
 
-        return (city, country)
+        return city, country
 
     def _get_gym(self) -> str:
         """Gets the name of fighter's gym.
@@ -423,29 +424,25 @@ class FighterScraper:
         }
 
         striking_stats = striking_stats_block1 | striking_stats_block2
+        
         return striking_stats
 
-    def _create_striking_obj(
-        self,
-        striking_stats: dict,
-        strike_position: StrikePosition,
-        strike_target: StrikeTarget,
-    ) -> Striking:
-        """Takes fighter's striking, strike position and striking target information and returns them as a Striking object.
-
-        Args:
-            striking_stats (dict): Dictionary containing fighter's striking information.
-            strike_position (StrikePosition): StrikePosition object containing fighter's strike position information.
-            strike_target (StrikeTarget): StrikeTarget object containing fighter's strike target information.
+    def _get_striking_obj(self) -> Striking:
+        """Gets fighter's striking, strike position and striking target information and returns them as a Striking object.
 
         Returns:
             Striking: Striking object containing all of the fighter's striking, strike position and striking target information.
         """
-
+        
+        strike_position_obj = self._get_strike_position_obj()
+        strike_target_obj = self._get_strike_target_obj()
+        striking_stats = self._get_striking_stats()
+        
         stats = striking_stats | {
-            "strike_position": strike_position,
-            "strike_target": strike_target,
+            "strike_position": strike_position_obj,
+            "strike_target": strike_target_obj,
         }
+        
         return Striking(**stats)
 
     def _get_grappling_obj(self) -> Grappling:
@@ -523,7 +520,7 @@ class FighterScraper:
             except IndexError:
                 pass
 
-        return (accuracy, landed, attempted)
+        return accuracy, landed, attempted
 
     def _parse_stats_section(self, target: Tag) -> dict:
         """Parses stats section for strike position and win method information. Returns them as a dictionary.
@@ -644,14 +641,7 @@ class FighterScraper:
 
         win_method_obj = self._get_win_method_obj()
 
-        strike_position_obj = self._get_strike_position_obj()
-
-        strike_target_obj = self._get_strike_target_obj()
-
-        striking_stats = self._get_striking_stats()
-        striking_obj = self._create_striking_obj(
-            striking_stats, strike_position_obj, strike_target_obj
-        )
+        striking_obj = self._get_striking_obj()
 
         grappling_obj = self._get_grappling_obj()
 
