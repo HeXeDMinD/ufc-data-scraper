@@ -53,6 +53,8 @@ class FighterScraper:
         """
 
         self._soup = None
+        self._stats_section = None
+        self._stats_targets = None
         self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
 
     def _get_name(self) -> str:
@@ -256,12 +258,8 @@ class FighterScraper:
 
         return average_fight_time
 
-    def _get_win_method_obj(self, stats_section: ResultSet, index: int) -> WinMethod:
-        """Get win method information from ResultSet and return it as a WinMethod object.
-
-        Args:
-            stats_section (ResultSet): ResultSet object containing fighters win method information.
-            index (int): Index for correct stats section.
+    def _get_win_method_obj(self) -> WinMethod:
+        """Get win method information and return it as a WinMethod object.
 
         Returns:
             WinMethod: WinMethod object containing fighter's win method information.
@@ -270,7 +268,7 @@ class FighterScraper:
         average_fight_time = self._get_average_fight_time()
 
         try:
-            win_method_stats = self._parse_stats_section(stats_section[index])
+            win_method_stats = self._parse_stats_section(self._stats_section[1])
             knockout, knockout_per = win_method_stats["ko/tko"]
             decision, decision_per = win_method_stats["dec"]
             submission, submission_per = win_method_stats["sub"]
@@ -324,21 +322,15 @@ class FighterScraper:
 
         return PhysicalStats(**physical_stats)
 
-    def _get_strike_position_obj(
-        self, stats_section: ResultSet, index: int
-    ) -> StrikePosition:
-        """Get fighter's strike position information from ResultSet and return it as a StrikePosition object.
-
-        Args:
-            stats_section (ResultSet): ResultSet object containing fighters strike position information.
-            index (int): Index for correct stats section.
+    def _get_strike_position_obj(self) -> StrikePosition:
+        """Get fighter's strike position information and return it as a StrikePosition object.
 
         Returns:
             StrikePosition: StrikePosition object containing fighter's strike position information.
         """
 
         try:
-            position_stats = self._parse_stats_section(stats_section[index])
+            position_stats = self._parse_stats_section(self._stats_section[0])
             standing, standing_per = position_stats["standing"]
             clinch, clinch_per = position_stats["clinch"]
             ground, ground_per = position_stats["ground"]
@@ -393,11 +385,8 @@ class FighterScraper:
 
         return StrikeTarget(**strike_target_stats)
 
-    def _get_striking_stats(self, stats_targets: ResultSet) -> dict:
-        """Get fighter's striking information from ResultSet and return it as a dict.
-
-        Args:
-            stats_targets (ResultSet): ResultSet object containing fighters striking and grappling information.
+    def _get_striking_stats(self) -> dict:
+        """Get fighter's striking information and return it as a dict.
 
         Returns:
             dict: Dictionary containing fighter's striking information.
@@ -408,7 +397,7 @@ class FighterScraper:
                 striking_accuracy,
                 strikes_landed,
                 strikes_attempted,
-            ) = self._parse_stat_block(stats_targets[0])
+            ) = self._parse_stat_block(self._stats_targets[0])
         except IndexError:
             striking_accuracy, strikes_landed, strikes_attempted = 0, 0, 0
 
@@ -424,7 +413,7 @@ class FighterScraper:
             "Sig. Str. Defense",
             "Knockdown Avg",
         ]
-        striking_results = self._parse_result_set(stats_targets, dict_keys)
+        striking_results = self._parse_result_set(self._stats_targets, dict_keys)
 
         striking_stats_block2 = {
             "strikes_average": float(striking_results["Sig. Str. Landed"]),
@@ -459,11 +448,8 @@ class FighterScraper:
         }
         return Striking(**stats)
 
-    def _get_grappling_obj(self, stats_targets: ResultSet) -> Grappling:
-        """Get fighter's grappling information from ResultSet and return it as a Grappling object.
-
-        Args:
-            stats_targets (ResultSet): ResultSet object containing fighters striking and grappling information.
+    def _get_grappling_obj(self) -> Grappling:
+        """Get fighter's grappling information and return it as a Grappling object.
 
         Returns:
             Grappling: Grappling object containing fighter's grappling information.
@@ -474,7 +460,7 @@ class FighterScraper:
                 takedown_accuracy,
                 takedowns_landed,
                 takedowns_attempted,
-            ) = self._parse_stat_block(stats_targets[1])
+            ) = self._parse_stat_block(self._stats_targets[1])
         except IndexError:
             takedown_accuracy, takedowns_landed, takedowns_attempted, = (
                 0,
@@ -489,7 +475,7 @@ class FighterScraper:
         }
 
         dict_keys = ["Takedown avg", "Takedown Defense", "Submission avg"]
-        grappling_results = self._parse_result_set(stats_targets, dict_keys)
+        grappling_results = self._parse_result_set(self._stats_targets, dict_keys)
         grappling_stats_block2 = {
             "takedowns_average": float(grappling_results["Takedown avg"]),
             "takedown_defence": int(grappling_results["Takedown Defense"]),
@@ -631,12 +617,12 @@ class FighterScraper:
         self._soup = BeautifulSoup(url_response.content, "html.parser")
 
         # StrikePosition and Win Method stats - 0 and 1 respectively
-        stats_section = self._soup.find_all(
+        self._stats_section = self._soup.find_all(
             "div", class_="c-stat-3bar c-stat-3bar--no-chart"
         )
 
         # Striking and Grappling stats - 0 and 1 respectively
-        stats_targets = self._soup.find_all(
+        self._stats_targets = self._soup.find_all(
             "div", class_="stats-records stats-records--two-column"
         )
 
@@ -656,18 +642,18 @@ class FighterScraper:
 
         physical_stats_obj = self._get_physical_stats_obj()
 
-        win_method_obj = self._get_win_method_obj(stats_section, 1)
+        win_method_obj = self._get_win_method_obj()
 
-        strike_position_obj = self._get_strike_position_obj(stats_section, 0)
+        strike_position_obj = self._get_strike_position_obj()
 
         strike_target_obj = self._get_strike_target_obj()
 
-        striking_stats = self._get_striking_stats(stats_targets)
+        striking_stats = self._get_striking_stats()
         striking_obj = self._create_striking_obj(
             striking_stats, strike_position_obj, strike_target_obj
         )
 
-        grappling_obj = self._get_grappling_obj(stats_targets)
+        grappling_obj = self._get_grappling_obj()
 
         fighter_data = {
             "fighter_url": self.fighter_url,
