@@ -36,8 +36,8 @@ class EventScraper:
         """
 
         events_endpoint = f"http://d29dxerjsp82wz.cloudfront.net/api/v3/event/live/{self._event_fmid}.json"
-        event_response = requests.get(events_endpoint)
 
+        event_response = requests.get(events_endpoint)
         event_response.raise_for_status()
 
         return event_response.json().get("LiveEventDetail")
@@ -410,8 +410,8 @@ class EventScraper:
         """
 
         self._event_data = self._get_event_data()
-        if not self._event_data:
-            return None
+        if len(self._event_data) < 1:
+            raise Exception("Could not retrieve event data.")
 
         self._incorrect_fighter_urls = get_incorrect_urls()
         self._fighter_urls = self._get_fighter_urls()
