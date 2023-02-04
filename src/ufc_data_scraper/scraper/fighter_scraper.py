@@ -550,11 +550,7 @@ class FighterScraper:
         try:
             accuracy, landed, attempted = self._parse_stat_block(self._stats_targets[1])
         except IndexError:
-            accuracy, landed, attempted, = (
-                0,
-                0,
-                0,
-            )
+            accuracy, landed, attempted = 0, 0, 0
 
         grappling_stats_block1 = {
             "takedown_accuracy": accuracy,

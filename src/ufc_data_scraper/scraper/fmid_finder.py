@@ -9,17 +9,38 @@ from datetime import datetime, timedelta
 from ufc_data_scraper.utils import convert_date
 
 
-def _page_is_valid(soup: BeautifulSoup) -> bool:
-    """Checks if page is empty.
+def _page_has_event_links(site_content: str) -> bool:
+    """Checks if page has event links.
 
     Args:
-        soup (BeautifulSoup): BeautifulSoup object of page response.
+        site_content (str): Site raw response content.
 
     Returns:
-        bool: Whether page is empty.
+        bool: Whether page has event links.
     """
 
+    soup = BeautifulSoup(site_content, "html.parser")
+
     return soup.find("h3", class_="c-card-event--result__headline") and True or False
+
+
+def _valid_event_page(site_content: str) -> bool:
+    """Checks if page is a valid event page.
+
+    Args:
+        site_content (str): Site raw response content.
+
+    Returns:
+        bool: Whether page is a valid event page.
+    """
+
+    soup = BeautifulSoup(site_content, "html.parser")
+
+    return (
+        soup.find("div", class_="c-hero__headline-suffix tz-change-inner")
+        and True
+        or False
+    )
 
 
 def get_event_urls(page_num: int) -> list[str]:
@@ -36,16 +57,15 @@ def get_event_urls(page_num: int) -> list[str]:
 
     site_response = requests.get("http://www.ufc.com/events", params=page_query)
 
-    if site_response.status_code != 200:
+    if site_response.status_code != 200 or not _page_has_event_links(
+        site_response.content
+    ):
         return
 
     only_headlines = SoupStrainer(
         "h3", attrs={"class": "c-card-event--result__headline"}
     )
     soup = BeautifulSoup(site_response.text, "html.parser", parse_only=only_headlines)
-
-    if not _page_is_valid(soup):
-        return
 
     headlines = list(soup)
 
@@ -168,16 +188,13 @@ def _scrape_event_fmid(site_response: requests.models.Response) -> int:
         int: Event FMID, can be used as API query or None if it cannot be scraped.
     """
 
-    if site_response.status_code != 200:
-        return None
-
     only_script = SoupStrainer("script", attrs={"type": "application/json"})
     soup = BeautifulSoup(site_response.content, "html.parser", parse_only=only_script)
 
-    site_scripts = json.loads(list(soup)[-1].text)
     try:
+        site_scripts = json.loads(list(soup)[-1].text)
         fmid = int(site_scripts["eventLiveStats"]["event_fmid"])
-    except KeyError:
+    except (KeyError, IndexError):
         fmid = None
 
     return fmid
@@ -193,9 +210,6 @@ def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
         int: Event FMID, can be used as API query or None if it cannot be acquired.
     """
 
-    if site_response.status_code != 200:
-        return None
-
     current_fmid = _get_last_fmid() - 10
 
     while True:
@@ -207,8 +221,8 @@ def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
         soup = BeautifulSoup(site_response.content, "html.parser")
 
         scraped_date = _get_event_date(soup)
-        scraped_date = _convert_scraped_date(scraped_date)
         if scraped_date:
+            scraped_date = _convert_scraped_date(scraped_date)
             api_date = convert_date(data["StartTime"])
             if abs(scraped_date - api_date) <= timedelta(days=2):
                 return current_fmid
@@ -227,9 +241,13 @@ def get_event_fmid(event_url: str) -> int:
 
     site_response = requests.get(event_url)
 
-    if site_response.status_code != 200:
-        return None
+    site_response.raise_for_status()
+
+    if not _valid_event_page(site_response.content):
+        raise Exception("Url is not a valid event url.")
 
     fmid = _scrape_event_fmid(site_response) or _brute_force_event_fmid(site_response)
+    if not fmid:
+        raise Exception(f"FMID could not be found for {event_url}")
 
     return fmid
