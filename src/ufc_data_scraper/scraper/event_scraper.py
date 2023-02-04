@@ -102,17 +102,9 @@ class EventScraper:
             str: Fighter's full name as a string.
         """
 
-        fighter_name = ""
-        first_name = fighter.get("Name").get("FirstName")
-        last_name = fighter.get("Name").get("LastName")
-        if first_name == "":
-            fighter_name = last_name
-        elif last_name == "":
-            fighter_name = first_name
-        else:
-            fighter_name = f"{first_name} {last_name}"
+        name_data = fighter.get("Name")
 
-        return fighter_name
+        return f"{name_data.get('FirstName')} {name_data.get('LastName')}".strip()
 
     def _get_fight_scores(self, fight: dict) -> list[FightScore]:
         """Get fight score information from fight dictionary convert each into a FightScore object and return them as a list.
@@ -171,6 +163,9 @@ class EventScraper:
 
         if not fighter_url:
             fighter_name = self._get_fighter_name(fighter)
+            if not fighter_name:
+                return None
+
             fighter_url = (
                 f"https://www.ufc.com/athlete/{fighter_name.replace(' ', '-')}"
             )
@@ -237,9 +232,7 @@ class EventScraper:
             list[FighterStats]: List of FighterStats objects.
         """
 
-        fighters = fight.get("Fighters")
-
-        return [self._get_fighters_stats(fighter) for fighter in fighters]
+        return [self._get_fighters_stats(fighter) for fighter in fight.get("Fighters")]
 
     def _get_result_obj(self, fight: dict) -> Result:
         """Get result information from fight dictionary and return it as a Result object.
@@ -315,14 +308,15 @@ class EventScraper:
             Accolade: Accolade object containing fight accolade information or None if no accolades are available.
         """
 
-        accolade_obj = None
-
         accolades = fight.get("Accolades")
-        if len(accolades) > 0:
-            accolade = accolades[0]
-            type = accolade.get("Type")
-            description = accolade.get("Name")
-            accolade_obj = Accolade(description, type)
+        if len(accolades) < 1:
+            return None
+
+        accolade = accolades[0]
+        type = accolade.get("Type")
+        description = accolade.get("Name")
+
+        accolade_obj = Accolade(description, type)
 
         return accolade_obj
 
@@ -418,11 +412,11 @@ class EventScraper:
         self._event_data = self._get_event_data()
         if not self._event_data:
             return None
-        
+
         self._incorrect_fighter_urls = get_incorrect_urls()
         self._fighter_urls = self._get_fighter_urls()
         self._scraped_fighters = self._scrape_fighters()
-        
+
         event_date = self._event_data.get("StartTime")
 
         event_info = {

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from ufc_data_scraper.data_models.base import Base
+from ufc_data_scraper.data_models.base import DataModelBase
 
 
 @dataclass(frozen=True, order=True)
-class StrikeTarget(Base):
+class StrikeTarget(DataModelBase):
     head: int
     head_per: int
     body: int

@@ -24,10 +24,9 @@ class TestUtils:
 
     def test_convert_date_missing_date(self):
         test_start_time = ""
-        expected = None
         actual = convert_date(test_start_time)
 
-        assert actual == expected
+        assert actual is None
 
     def test_get_incorrect_urls(self):
         actual = get_incorrect_urls()

@@ -14,13 +14,12 @@ def convert_date(date: str) -> datetime:
         datetime: Datetime object of supplied string, localized to GMT.
     """
 
-    date_obj = None
+    if not date:
+        return None
 
-    if date:
-        date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%MZ")
-        date_obj = pytz.timezone("GMT").localize(date_obj)
+    date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%MZ")
 
-    return date_obj
+    return pytz.timezone("GMT").localize(date_obj)
 
 
 def get_incorrect_urls() -> dict[str, str]:

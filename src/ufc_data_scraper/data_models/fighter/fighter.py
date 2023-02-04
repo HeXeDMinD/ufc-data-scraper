@@ -5,11 +5,11 @@ from ufc_data_scraper.data_models.fighter.win_method import WinMethod
 from ufc_data_scraper.data_models.fighter.physical_stats import PhysicalStats
 from ufc_data_scraper.data_models.fighter.striking import Striking
 from ufc_data_scraper.data_models.fighter.grappling import Grappling
-from ufc_data_scraper.data_models.base import Base
+from ufc_data_scraper.data_models.base import DataModelBase
 
 
 @dataclass(frozen=True, order=True)
-class Fighter(Base):
+class Fighter(DataModelBase):
     fighter_url: str
     name: str
     nickname: str

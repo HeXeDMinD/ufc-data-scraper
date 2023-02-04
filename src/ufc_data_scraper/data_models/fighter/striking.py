@@ -2,11 +2,11 @@ from dataclasses import dataclass
 
 from ufc_data_scraper.data_models.fighter.strike_target import StrikeTarget
 from ufc_data_scraper.data_models.fighter.strike_position import StrikePosition
-from ufc_data_scraper.data_models.base import Base
+from ufc_data_scraper.data_models.base import DataModelBase
 
 
 @dataclass(frozen=True, order=True)
-class Striking(Base):
+class Striking(DataModelBase):
     striking_accuracy: int
     strikes_landed: int
     strikes_attempted: int

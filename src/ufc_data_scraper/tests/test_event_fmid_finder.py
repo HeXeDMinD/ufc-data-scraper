@@ -2,7 +2,7 @@ import requests
 import pytz
 
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from ufc_data_scraper.scraper.fmid_finder import (
     _page_is_valid,
@@ -12,74 +12,79 @@ from ufc_data_scraper.scraper.fmid_finder import (
     _get_event_date,
     _convert_scraped_date,
     _scrape_event_fmid,
+    _brute_force_event_fmid,
     get_event_fmid,
 )
 
 
 class TestEventFmidFinder:
     def test_page_is_valid_valid_page(self):
-        test_page = "<h3></h3>"
+        test_page = """
+            <div class="c-card-event--result__info">
+                <h3 class="c-card-event--result__headline">
+                    <a href="/event/ufc-287">Pereira vs Adesanya 2</a>
+                </h3>
+                <div class="c-card-event--result__date tz-change-data" data-locale="en" data-main-card="Sun, Apr 9 / 4:00 AM SAST" data-main-card-timestamp="1681005600" data-prelims-card="Sun, Apr 9 / 2:00 AM SAST" data-prelims-card-timestamp="1680998400" data-early-card="Sun, Apr 9 / 12:15 AM SAST" data-early-card-timestamp="1680992100" data-card-event-metric="0" data-card-event-title="Main Card">
+                    <a href="/event/ufc-287">Sun, Apr 9 / 4:00 AM SAST / Main Card</a>
+                </div>
+                <div class="e-p--small c-card-event--result__location"></div>
+            </div>
+        """
         test_soup = BeautifulSoup(test_page, "html.parser")
-        expected = True
 
-        assert _page_is_valid(test_soup) == expected
+        assert _page_is_valid(test_soup) is True
 
     def test_page_is_valid_invalid_page(self):
-        test_page = "<h2></h2>"
+        test_page = """
+            <div class="c-card-event--result__info">
+                <h3>
+                    <a href="/event/ufc-287">Pereira vs Adesanya 2</a>
+                </h3>
+                <div class="c-card-event--result__date tz-change-data" data-locale="en" data-main-card="Sun, Apr 9 / 4:00 AM SAST" data-main-card-timestamp="1681005600" data-prelims-card="Sun, Apr 9 / 2:00 AM SAST" data-prelims-card-timestamp="1680998400" data-early-card="Sun, Apr 9 / 12:15 AM SAST" data-early-card-timestamp="1680992100" data-card-event-metric="0" data-card-event-title="Main Card">
+                    <a href="/event/ufc-287">Sun, Apr 9 / 4:00 AM SAST / Main Card</a>
+                </div>
+                <div class="e-p--small c-card-event--result__location"></div>
+            </div>
+        """
         test_soup = BeautifulSoup(test_page, "html.parser")
-        expected = False
 
-        assert _page_is_valid(test_soup) == expected
+        assert _page_is_valid(test_soup) is False
 
     def test_page_is_valid_empty_page(self):
         test_page = ""
         test_soup = BeautifulSoup(test_page, "html.parser")
-        expected = False
 
-        assert _page_is_valid(test_soup) == expected
+        assert _page_is_valid(test_soup) is False
 
-    def test_get_event_urls_type(self):
-        test_page_num = 0
-        expected = list
-        actual = get_event_urls(test_page_num)
-
-        assert isinstance(actual, expected)
-
-    def test_get_event_urls_length(self):
+    def test_get_event_urls(self):
         # test whether function actually returns urls.
         test_page_num = 0
-        expected = 0
         actual = get_event_urls(test_page_num)
 
-        assert len(actual) > expected
+        assert isinstance(actual, list)
+        assert len(actual) > 0
 
-    def test_get_last_fmid_type(self):
-        expected = int
-        actual = _get_last_fmid()
+    def test_get_event_urls_invalid_page(self):
+        # test whether function actually returns urls.
+        test_page_num = 99999
+        actual = get_event_urls(test_page_num)
 
-        assert isinstance(actual, expected)
+        assert actual is None
 
     def test_get_last_fmid(self):
         # test whether function actually returns an fmid.
-        expected = 0
         actual = _get_last_fmid()
 
-        assert actual > expected
-
-    def test_get_event_data_type(self):
-        test_fmid = 1124
-        expected = dict
-        actual = _get_event_data(test_fmid)
-
-        assert isinstance(actual, expected)
+        assert isinstance(actual, int)
+        assert actual > 0
 
     def test_get_event_data(self):
         # test whether function actually returns data.
         test_fmid = 1124
-        expected = 0
         actual = _get_event_data(test_fmid)
 
-        assert len(actual) > expected
+        assert isinstance(actual, dict)
+        assert len(actual) > 0
 
     def test_get_event_date(self):
         test_event_url = "https://www.ufc.com/event/ufc-282"
@@ -93,17 +98,9 @@ class TestEventFmidFinder:
     def test_get_event_date_invalid_page(self):
         invalid_page = ""
         test_soup = BeautifulSoup(invalid_page, "html.parser")
-        expected = None
         actual = _get_event_date(test_soup)
 
-        assert actual == expected
-
-    def test_convert_scraped_date_type(self):
-        test_date = "Sat, Dec 10 / 10:00 PM EST"
-        expected = datetime
-        actual = _convert_scraped_date(test_date)
-
-        assert isinstance(actual, expected)
+        assert actual is None
 
     def test_convert_scraped_date(self):
         test_date = "Sat, Dec 10 / 10:00 PM EST"
@@ -115,7 +112,18 @@ class TestEventFmidFinder:
         )
         actual = _convert_scraped_date(test_date)
 
+        assert isinstance(actual, datetime)
         assert actual == expected
+
+    def test_convert_scraped_date_next_year(self):
+        date_now = datetime.now() - timedelta(days=30)
+        test_date = datetime.strftime(date_now, "%a, %b %d / %I:%M %p EST")
+
+        expected = date_now + timedelta(days=365)
+
+        actual = _convert_scraped_date(test_date)
+
+        assert actual.year == expected.year
 
     def test_scrape_event_fmid(self):
         test_url = "https://www.ufc.com/event/ufc-282"
@@ -123,7 +131,15 @@ class TestEventFmidFinder:
         actual = _scrape_event_fmid(requests.get(test_url))
 
         assert actual == expected
-        
+
+    def test_brute_force_event_fmid(self):
+        event_urls = get_event_urls(page_num=0)
+        test_url = event_urls[0]
+
+        actual = _brute_force_event_fmid(requests.get(test_url))
+
+        assert actual is not None
+
     def test_get_event_fmid(self):
         test_url = "https://www.ufc.com/event/ufc-282"
         expected = 1124

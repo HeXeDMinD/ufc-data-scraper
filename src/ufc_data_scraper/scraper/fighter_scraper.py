@@ -48,14 +48,136 @@ class FighterScraper:
             fighter_url (url): UFC fighter page url.
             incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. If supplied the scraper won't request it from web app.
 
-        >>> fighter_scraper = _FighterScraper(fighter_url)
-        >>> fighter = fighter_scraper._scrape_fighter()
+        >>> fighter_scraper = FighterScraper(fighter_url)
+        >>> fighter = fighter_scraper.scrape_fighter()
         """
 
+        self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
         self._soup = None
         self._stats_section = None
         self._stats_targets = None
-        self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
+
+    def _create_soup(self, content: str) -> None:
+        """Creates Beautiful soup object from provided content and assigns it to _soup.
+
+        Args:
+            content (str): Content to create soup from.
+        """
+
+        self._soup = BeautifulSoup(content, "html.parser")
+
+        # StrikePosition and Win Method stats - 0 and 1 respectively
+        self._stats_section = self._soup.find_all(
+            "div", class_="c-stat-3bar c-stat-3bar--no-chart"
+        )
+
+        # Striking and Grappling stats - 0 and 1 respectively
+        self._stats_targets = self._soup.find_all(
+            "div", class_="stats-records stats-records--two-column"
+        )
+
+    def _parse_stat_block(self, target: Tag) -> tuple:
+        """Parses stat block for striking and takedown stats, gets accuracy, landed and attempted information. Returns them as a tuple of int values.
+
+        Args:
+            target (Tag): Tag containing desired stats.
+
+        Returns:
+            tuple: (accuracy, landed, attempted)
+        """
+
+        stats = []
+
+        try:
+            acc_target = target.find("title")
+            accuracy = acc_target.get_text().split()[-1].replace("%", "").strip()
+            stats.append(int(accuracy))
+        except (IndexError, AttributeError):
+            stats.append(0)
+
+        targets = target.find_all("dd", "c-overlap__stats-value")
+        if not targets:
+            return stats[0], 0, 0
+
+        for target in targets:
+            target_text = target.get_text().strip()
+            if target_text:
+                stats.append(int(target_text))
+            else:
+                stats.append(0)
+
+        return tuple(stats)
+
+    def _parse_stats_section(self, target: Tag) -> tuple[tuple[int, int]]:
+        """Parses stats section for strike position and win method information. Returns them as a a tuple of tuples.
+
+        Args:
+            target (Tag): Tag containing desired information.
+
+        Return
+            tuple: Tuple of tuples containing value and percentage as ints.
+        """
+
+        tags = target.find_all("div", class_="c-stat-3bar__group")
+        if not tags:
+            return (0, 0), (0, 0), (0, 0)
+
+        stats = []
+        for tag in tags:
+            text_split = (
+                tag.find("div", class_="c-stat-3bar__value").get_text().split(" ")
+            )
+            try:
+                value = int(text_split[0].strip())
+                value_per = int(
+                    re.search(r"([0-9]+)", text_split[1].strip())
+                    .group()
+                    .replace("%", "")
+                )
+            except (IndexError, ValueError):
+                value, value_per = 0, 0
+
+            stats.append((value, value_per))
+
+        return tuple(stats)
+
+    def _parse_result_set(self, result_set: ResultSet, dict_keys: list[str]) -> dict:
+        """Parses result set for supplied dictionary keys and returns them as a dictionary.
+
+        Args:
+            result_set (ResultSet): ResultSet object containing fighters striking and grappling information.
+            dict_keys (list[str]): List of dicionary keys to find within result_set.
+
+        Returns:
+            dict: Dictionary of requested information from ResultSet.
+        """
+
+        stats = {key: 0 for key in dict_keys}
+
+        for result in result_set:
+            for target in result.find_all("div", class_="c-stat-compare__group"):
+                label = target.find("div", class_="c-stat-compare__label")
+
+                if not label:
+                    break
+
+                label = label.get_text().strip()
+                if label not in dict_keys:
+                    continue
+
+                value = target.find("div", class_="c-stat-compare__number")
+                if not value:
+                    continue
+
+                value_text = value.get_text().replace("%", "").strip()
+                if value_text:
+                    if "." in value_text:
+                        value_text = float(value_text)
+                    else:
+                        value_text = int(value_text)
+                    stats[label] = value_text
+
+        return stats
 
     def _get_name(self) -> str:
         """Gets fighter name.
@@ -71,7 +193,7 @@ class FighterScraper:
             name = target.get_text()
 
         name = name.replace("-", " ")
-        
+
         return unidecode(name.strip())
 
     def _get_nickname(self) -> str:
@@ -102,9 +224,11 @@ class FighterScraper:
         targets = self._soup.find_all("div", class_="c-bio__field")
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
-            if label == "Status":
-                status = target.find("div", class_="c-bio__text").get_text().strip()
-                break
+            if label != "Status":
+                continue
+
+            status = target.find("div", class_="c-bio__text").get_text().strip()
+            break
 
         return status
 
@@ -120,18 +244,24 @@ class FighterScraper:
         champion_keywords = ("Interim", "Champion", "Title")
 
         targets = self._soup.find_all("p", class_="hero-profile__tag")
+        if not targets:
+            return ranking, pfp_ranking
+
         for target in targets:
             text = target.get_text().strip()
             for keyword in champion_keywords:
-                if keyword in text:
-                    ranking = text
+                if keyword not in text:
+                    continue
+                ranking = text
+                break
+
+            if "PFP" in text:
+                pfp_ranking = text
+                continue
 
             match = re.match(r"^(#[0-9]+)", text)
             if match:
-                if "PFP" in text:
-                    pfp_ranking = f"{match.group()} PFP"
-                else:
-                    ranking = match.group()
+                ranking = match.group()
 
         return ranking, pfp_ranking
 
@@ -142,19 +272,13 @@ class FighterScraper:
             str: Weight class.
         """
 
-        weightclass = "None"
-
         target = self._soup.find("p", class_="hero-profile__division-title")
         if target:
             target_text = target.get_text().strip()
-            if target_text != "":
-                weightclass = target_text
-            else:
-                match = re.search(r"\s([a-z]+weight)\s", str())
-                if match:
-                    weightclass = f"{match.group().strip().capitalize()} Division"
+            if target_text:
+                return target_text
 
-        return weightclass
+        return "None"
 
     def _get_hometown(self) -> tuple:
         """Gets fighter's home city and country. Returns them as a tuple of str values.
@@ -166,17 +290,25 @@ class FighterScraper:
         city, country = "Unlisted", "Unlisted"
 
         targets = self._soup.find_all("div", class_="c-bio__field")
+        if not targets:
+            return city, country
+
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
-            if label == "Hometown":
-                text = target.find("div", class_="c-bio__text").get_text()
-                split_text = text.split(", ")
-                if len(split_text) > 1:
-                    city = split_text[0].strip()
-                    country = split_text[1].strip()
-                else:
-                    country = text.strip()
+            if label != "Hometown":
+                continue
+
+            target_text = target.find("div", class_="c-bio__text").get_text()
+            if not target_text:
                 break
+
+            split_text = target_text.split(", ")
+            if len(split_text) > 1:
+                city = split_text[0].strip()
+                country = split_text[1].strip()
+            else:
+                country = target_text.strip()
+            break
 
         return city, country
 
@@ -187,17 +319,25 @@ class FighterScraper:
             str: Gym.
         """
 
+        gym = "Unlisted"
+
         targets = self._soup.find_all("div", class_="c-bio__field")
         if not targets:
-            return "Unlisted"
-        
+            return gym
+
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
-            if label == "Trains at":
-                return target.find("div", class_="c-bio__text").get_text().strip()
+            if label != "Trains at":
+                continue
 
-        return "Unlisted"
-    
+            target_text = target.find("div", class_="c-bio__text").get_text().strip()
+            if not target_text:
+                break
+
+            return target_text
+
+        return gym
+
     def _get_fighting_style(self) -> str:
         """Gets fighter's fighting style.
 
@@ -208,33 +348,21 @@ class FighterScraper:
         fighting_style = "Unlisted"
 
         targets = self._soup.find_all("div", class_="c-bio__field")
+        if not targets:
+            return fighting_style
+
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
-            if label == "Fighting style":
-                fighting_style = (
-                    target.find("div", class_="c-bio__text").get_text().strip()
-                )
+            if label != "Fighting style":
+                continue
+
+            target_text = target.find("div", class_="c-bio__text").get_text().strip()
+            if not target_text:
                 break
 
+            return target_text
+
         return fighting_style
-
-    def _get_record_obj(self) -> Record:
-        """Get record information from fighter page and return it as a Record object.
-
-        Returns:
-            Record: Record object containing fighter's record information.
-        """
-
-        win, loss, draw = 0, 0, 0
-
-        target = self._soup.find("p", class_="hero-profile__division-body")
-        if target:
-            text = target.get_text().strip().split()[0]
-            win, loss, draw = text.split("-")
-
-        record = {"win": int(win), "loss": int(loss), "draw": int(draw)}
-
-        return Record(**record)
 
     def _get_average_fight_time(self) -> str:
         """Gets fighter's average fight time.
@@ -248,16 +376,217 @@ class FighterScraper:
         targets = self._soup.find_all(
             "div", class_="c-stat-compare__group c-stat-compare__group-2"
         )
+        if not targets:
+            return average_fight_time
+
         for target in targets:
             label = target.find("div", class_="c-stat-compare__label").get_text()
-            if label == "Average fight time":
-                time = target.find("div", class_="c-stat-compare__number")
-                if time:
-                    time = time.get_text().strip()
-                    if time != "":
-                        average_fight_time = time
+            if label != "Average fight time":
+                continue
+
+            target_text = target.find("div", class_="c-stat-compare__number")
+            target_text = target_text.get_text().strip()
+            if target_text:
+                average_fight_time = target_text
 
         return average_fight_time
+
+    def _get_strike_position_stats(self) -> tuple[tuple[int, int]]:
+        """Get strike position information from fighter page and return it a tuple of tuples.
+
+        Indexes:
+            0 - Standing
+            1 - Clinch
+            2 - Ground
+        Returns:
+            tuple[tuple[int, int]]: Each tuple strike position count and percentage.
+        """
+
+        try:
+            strike_position_stats_section = self._stats_section[0]
+
+            return self._parse_stats_section(strike_position_stats_section)
+        except IndexError:
+            return (0, 0), (0, 0), (0, 0)
+
+    def _get_strike_target_stats(self) -> dict:
+        """Gets fighters strike target information and returns them as a dictionary.
+
+        Returns:
+            dict: Dictionary containing head, body and leg target stats.
+        """
+
+        strike_target_stats = {}
+
+        target = self._soup.find("svg", class_="c-stat-body__svg")
+        if not target:
+            return {"head": (0, 0), "body": (0, 0), "leg": (0, 0)}
+
+        targets = target.find_all("g")
+        for target in targets:
+            text_targets = target.find_all("text")
+            if not text_targets:
+                continue
+
+            stats_key = text_targets[2].get_text().strip().lower()
+            stats = []
+            for i in range(1, -1, -1):
+                stat = text_targets[i].get_text().replace("%", "").strip()
+                try:
+                    stat = int(stat)
+                except ValueError:
+                    stat = 0
+                stats.append(stat)
+            strike_target_stats[stats_key] = tuple(stats)
+
+        return strike_target_stats
+
+    def _get_striking_stats(self) -> dict:
+        """Get fighter's striking information and return it as a dict.
+
+        Returns:
+            dict: Dictionary containing fighter's striking information.
+        """
+
+        # if _stats_targets[0] doesn't exist we catch the error
+        try:
+            accuracy, landed, attempted = self._parse_stat_block(self._stats_targets[0])
+        except IndexError:
+            accuracy, landed, attempted = 0, 0, 0
+
+        striking_stats_block1 = {
+            "striking_accuracy": accuracy,
+            "strikes_landed": landed,
+            "strikes_attempted": attempted,
+        }
+
+        dict_keys = [
+            "Sig. Str. Landed",
+            "Sig. Str. Absorbed",
+            "Sig. Str. Defense",
+            "Knockdown Avg",
+        ]
+        striking_results = self._parse_result_set(self._stats_targets, dict_keys)
+        striking_stats_block2 = {
+            "strikes_average": striking_results["Sig. Str. Landed"],
+            "strikes_absorbed_average": striking_results["Sig. Str. Absorbed"],
+            "striking_defence": striking_results["Sig. Str. Defense"],
+            "knockdown_average": striking_results["Knockdown Avg"],
+        }
+
+        striking_stats = striking_stats_block1 | striking_stats_block2
+
+        return striking_stats
+
+    def _get_record_stats(self) -> tuple[int, int, int]:
+        """Get record information from fighter page and returns it as a tuple.
+
+        Returns:
+            tuple: (win, loss, draw)
+        """
+
+        win, loss, draw = 0, 0, 0
+
+        target = self._soup.find("p", class_="hero-profile__division-body")
+
+        try:
+            text = target.get_text().strip().split()[0]
+            return tuple(int(text) for text in text.split("-"))
+        except (IndexError, AttributeError):
+            return win, loss, draw
+
+    def _get_win_method_stats(self) -> tuple[tuple[int, int]]:
+        """Get win method information from fighter page and return it a tuple of tuples.
+
+        Indexes:
+            0 - Knockout
+            1 - Decision
+            2 - Submission
+        Returns:
+            tuple[tuple[int, int]]: Each tuple win method count and percentage.
+        """
+
+        try:
+            win_method_stats_section = self._stats_section[1]
+
+            return self._parse_stats_section(win_method_stats_section)
+        except IndexError:
+            return (0, 0), (0, 0), (0, 0)
+
+    def _get_physical_stats(self) -> dict:
+        """Gets fighters physical stats and returns them as a dictionary.
+
+        Returns:
+            dict: Dictionary containing fighters age, height, weight, reach and leg_reach.
+        """
+
+        field_names = ["Age", "Height", "Weight", "Reach", "Leg reach"]
+        targets = self._soup.find_all("div", class_="c-bio__field")
+
+        physical_stats = {key.lower().replace(" ", "_"): 0 for key in field_names}
+        for target in targets:
+            label = target.find("div", class_="c-bio__label").get_text()
+            if label not in field_names:
+                continue
+
+            key = label.lower().replace(" ", "_")
+            field_value = target.find("div", class_="c-bio__text").get_text().strip()
+            if field_value:
+                if label == "Age":
+                    physical_stats[key] = int(field_value)
+                    continue
+                physical_stats[key] = float(field_value)
+
+        return physical_stats
+
+    def _get_grappling_stats(self) -> dict:
+        """Get fighter's grappling information and return it as a dict.
+
+        Returns:
+            dict: Dictionary containing fighter's grappling information.
+        """
+
+        # if _stats_targets[1] doesn't exist we catch the error
+        try:
+            accuracy, landed, attempted = self._parse_stat_block(self._stats_targets[1])
+        except IndexError:
+            accuracy, landed, attempted, = (
+                0,
+                0,
+                0,
+            )
+
+        grappling_stats_block1 = {
+            "takedown_accuracy": accuracy,
+            "takedowns_landed": landed,
+            "takedowns_attempted": attempted,
+        }
+
+        dict_keys = ["Takedown avg", "Takedown Defense", "Submission avg"]
+        grappling_results = self._parse_result_set(self._stats_targets, dict_keys)
+        grappling_stats_block2 = {
+            "takedowns_average": grappling_results["Takedown avg"],
+            "takedown_defence": grappling_results["Takedown Defense"],
+            "submission_average": grappling_results["Submission avg"],
+        }
+
+        grappling_stats = grappling_stats_block1 | grappling_stats_block2
+
+        return grappling_stats
+
+    # Object related methods
+    def _get_record_obj(self) -> Record:
+        """Get record information from fighter page and return it as a Record object.
+
+        Returns:
+            Record: Record object containing fighter's record information.
+        """
+
+        win, loss, draw = self._get_record_stats()
+
+        record = {"win": win, "loss": loss, "draw": draw}
+
+        return Record(**record)
 
     def _get_win_method_obj(self) -> WinMethod:
         """Get win method information and return it as a WinMethod object.
@@ -267,16 +596,11 @@ class FighterScraper:
         """
 
         average_fight_time = self._get_average_fight_time()
+        win_method_stats = self._get_win_method_stats()
 
-        try:
-            win_method_stats = self._parse_stats_section(self._stats_section[1])
-            knockout, knockout_per = win_method_stats["ko/tko"]
-            decision, decision_per = win_method_stats["dec"]
-            submission, submission_per = win_method_stats["sub"]
-        except IndexError:
-            knockout, knockout_per = 0, 0
-            decision, decision_per = 0, 0
-            submission, submission_per = 0, 0
+        knockout, knockout_per = win_method_stats[0]
+        decision, decision_per = win_method_stats[1]
+        submission, submission_per = win_method_stats[2]
 
         win_method_stats = {
             "knockout": knockout,
@@ -297,29 +621,7 @@ class FighterScraper:
             PhysicalStats: PhysicalStats object containing fighter's physical stats information.
         """
 
-        field_names = ["Age", "Height", "Weight", "Reach", "Leg reach"]
-        physical_stats = {
-            "age": 0,
-            "height": 0,
-            "weight": 0,
-            "reach": 0,
-            "leg_reach": 0,
-        }
-        keys = list(physical_stats.keys())
-
-        targets = self._soup.find_all("div", class_="c-bio__field")
-        for target in targets:
-            label = target.find("div", class_="c-bio__label").get_text()
-            for i, name in enumerate(field_names):
-                if label == name:
-                    field_value = (
-                        target.find("div", class_="c-bio__text").get_text().strip()
-                    )
-                    if field_value:
-                        if name != "Age":
-                            physical_stats[keys[i]] = float(field_value)
-                        else:
-                            physical_stats[keys[i]] = int(field_value)
+        physical_stats = self._get_physical_stats()
 
         return PhysicalStats(**physical_stats)
 
@@ -330,15 +632,11 @@ class FighterScraper:
             StrikePosition: StrikePosition object containing fighter's strike position information.
         """
 
-        try:
-            position_stats = self._parse_stats_section(self._stats_section[0])
-            standing, standing_per = position_stats["standing"]
-            clinch, clinch_per = position_stats["clinch"]
-            ground, ground_per = position_stats["ground"]
-        except IndexError:
-            standing, standing_per = 0, 0
-            clinch, clinch_per = 0, 0
-            ground, ground_per = 0, 0
+        strike_position_stats = self._get_strike_position_stats()
+
+        standing, standing_per = strike_position_stats[0]
+        clinch, clinch_per = strike_position_stats[1]
+        ground, ground_per = strike_position_stats[2]
 
         strike_position_stats = {
             "standing": standing,
@@ -348,6 +646,7 @@ class FighterScraper:
             "ground": ground,
             "ground_per": ground_per,
         }
+
         return StrikePosition(**strike_position_stats)
 
     def _get_strike_target_obj(self) -> StrikeTarget:
@@ -357,75 +656,21 @@ class FighterScraper:
             StrikeTarget: StrikeTarget object containing fighter's strike target information.
         """
 
-        field_names = ["head", "body", "leg"]
-        strike_target_stats = {
-            "head": 0,
-            "head_per": 0,
-            "body": 0,
-            "body_per": 0,
-            "leg": 0,
-            "leg_per": 0,
-        }
+        strike_target_stats = self._get_strike_target_stats()
 
-        target = self._soup.find("svg", class_="c-stat-body__svg")
-        if target:
-            fields = target.find_all("text")
-            for name in field_names:
-                value, value_per = 0, 0
-                for field in fields:
-                    try:
-                        field_id = field["id"]
-                    except KeyError:
-                        continue
-                    if f"{name}_percent" in field_id:
-                        value_per = field.get_text().replace("%", "").strip()
-                    elif f"{name}_value" in field_id:
-                        value = field.get_text().strip()
-                strike_target_stats[name] = int(value)
-                strike_target_stats[f"{name}_per"] = int(value_per)
+        head, head_per = strike_target_stats["head"]
+        body, body_per = strike_target_stats["body"]
+        leg, leg_per = strike_target_stats["leg"]
+        strike_target_stats = {
+            "head": head,
+            "head_per": head_per,
+            "body": body,
+            "body_per": body_per,
+            "leg": leg,
+            "leg_per": leg_per,
+        }
 
         return StrikeTarget(**strike_target_stats)
-
-    def _get_striking_stats(self) -> dict:
-        """Get fighter's striking information and return it as a dict.
-
-        Returns:
-            dict: Dictionary containing fighter's striking information.
-        """
-
-        try:
-            (
-                striking_accuracy,
-                strikes_landed,
-                strikes_attempted,
-            ) = self._parse_stat_block(self._stats_targets[0])
-        except IndexError:
-            striking_accuracy, strikes_landed, strikes_attempted = 0, 0, 0
-
-        striking_stats_block1 = {
-            "striking_accuracy": striking_accuracy,
-            "strikes_landed": strikes_landed,
-            "strikes_attempted": strikes_attempted,
-        }
-
-        dict_keys = [
-            "Sig. Str. Landed",
-            "Sig. Str. Absorbed",
-            "Sig. Str. Defense",
-            "Knockdown Avg",
-        ]
-        striking_results = self._parse_result_set(self._stats_targets, dict_keys)
-
-        striking_stats_block2 = {
-            "strikes_average": float(striking_results["Sig. Str. Landed"]),
-            "strikes_absorbed_average": float(striking_results["Sig. Str. Absorbed"]),
-            "striking_defence": int(striking_results["Sig. Str. Defense"]),
-            "knockdown_average": float(striking_results["Knockdown Avg"]),
-        }
-
-        striking_stats = striking_stats_block1 | striking_stats_block2
-        
-        return striking_stats
 
     def _get_striking_obj(self) -> Striking:
         """Gets fighter's striking, strike position and striking target information and returns them as a Striking object.
@@ -433,16 +678,16 @@ class FighterScraper:
         Returns:
             Striking: Striking object containing all of the fighter's striking, strike position and striking target information.
         """
-        
+
         strike_position_obj = self._get_strike_position_obj()
         strike_target_obj = self._get_strike_target_obj()
         striking_stats = self._get_striking_stats()
-        
+
         stats = striking_stats | {
             "strike_position": strike_position_obj,
             "strike_target": strike_target_obj,
         }
-        
+
         return Striking(**stats)
 
     def _get_grappling_obj(self) -> Grappling:
@@ -452,150 +697,9 @@ class FighterScraper:
             Grappling: Grappling object containing fighter's grappling information.
         """
 
-        try:
-            (
-                takedown_accuracy,
-                takedowns_landed,
-                takedowns_attempted,
-            ) = self._parse_stat_block(self._stats_targets[1])
-        except IndexError:
-            takedown_accuracy, takedowns_landed, takedowns_attempted, = (
-                0,
-                0,
-                0,
-            )
-
-        grappling_stats_block1 = {
-            "takedown_accuracy": takedown_accuracy,
-            "takedowns_landed": takedowns_landed,
-            "takedowns_attempted": takedowns_attempted,
-        }
-
-        dict_keys = ["Takedown avg", "Takedown Defense", "Submission avg"]
-        grappling_results = self._parse_result_set(self._stats_targets, dict_keys)
-        grappling_stats_block2 = {
-            "takedowns_average": float(grappling_results["Takedown avg"]),
-            "takedown_defence": int(grappling_results["Takedown Defense"]),
-            "submission_average": float(grappling_results["Submission avg"]),
-        }
-
-        grappling_stats = grappling_stats_block1 | grappling_stats_block2
+        grappling_stats = self._get_grappling_stats()
 
         return Grappling(**grappling_stats)
-
-    def _parse_stat_block(self, target: Tag) -> tuple:
-        """Parses stat block for striking and takedown stats, gets accuracy, landed and attempted information. Returns them as a tuple of int values.
-
-        Args:
-            target (Tag): Tag containing desired stats.
-
-        Returns:
-            tuple: (accuracy, landed, attempted)
-        """
-
-        accuracy, landed, attempted = 0, 0, 0
-
-        acc_target = target.find("title")
-        if acc_target:
-            try:
-                accuracy = int(
-                    acc_target.get_text().split()[-1].replace("%", "").strip()
-                )
-            except IndexError:
-                pass
-
-        targets = target.find_all("dd", "c-overlap__stats-value")
-        if targets:
-            try:
-                landed_target = targets[0].get_text().strip()
-                if landed_target != "":
-                    landed = int(landed_target)
-            except IndexError:
-                pass
-
-            try:
-                attempted_target = targets[1].get_text().strip()
-                if attempted_target != "":
-                    attempted = int(attempted_target)
-            except IndexError:
-                pass
-
-        return accuracy, landed, attempted
-
-    def _parse_stats_section(self, target: Tag) -> dict:
-        """Parses stats section for strike position and win method information. Returns them as a dictionary.
-
-        Args:
-            target (Tag): Tag containing desired information.
-
-        keys:
-            StrikePosition: standing, clinch, ground
-            WinMethod: ko/tko, dec, sub
-
-        Return
-            dict: stats[key] = (value, value_per)
-        """
-        # TODO - Not super happy with this
-
-        stats = {}
-
-        tags = target.find_all("div", class_="c-stat-3bar__group")
-        if tags:
-            for tag in tags:
-                key = (
-                    tag.find("div", class_="c-stat-3bar__label")
-                    .get_text()
-                    .lower()
-                    .strip()
-                )
-
-                text_split = (
-                    tag.find("div", class_="c-stat-3bar__value").get_text().split("(")
-                )
-                try:
-                    value = int(text_split[0].strip())
-                    value_per = int(
-                        re.search(r"([0-9]+)", text_split[1].strip())
-                        .group()
-                        .replace("%", "")
-                    )
-                except IndexError:
-                    value, value_per = 0, 0
-
-                stats[key] = (value, value_per)
-
-        return stats
-
-    def _parse_result_set(self, result_set: ResultSet, dict_keys: list[str]) -> dict:
-        """Parses result set for supplied dictionary keys and returns them as a dictionary.
-
-        Args:
-            result_set (ResultSet): ResultSet object containing fighters striking and grappling information.
-            dict_keys (list[str]): List of dicionary keys to find within result_set.
-
-        Returns:
-            dict: Dictionary of requested information from ResultSet.
-        """
-
-        stats = {key: 0 for key in dict_keys}
-
-        for result in result_set:
-            for target in result.find_all("div", class_="c-stat-compare__group"):
-                label = target.find("div", class_="c-stat-compare__label")
-
-                if not label:
-                    break
-
-                label = label.get_text().strip()
-                for key in dict_keys:
-                    if label == key:
-                        value = target.find("div", class_="c-stat-compare__number")
-                        if value and value.get_text() != "":
-                            value = value.get_text().replace("%", "")
-                            stats[key] = value.strip()
-                            break
-
-        return stats
 
     def scrape_fighter(self) -> Fighter:
         """Scrapes fighter data from fighter url and returns it as a Fighter object.
@@ -611,57 +715,28 @@ class FighterScraper:
 
         url_response.raise_for_status()
 
-        self._soup = BeautifulSoup(url_response.content, "html.parser")
+        self._create_soup(url_response.content)
 
-        # StrikePosition and Win Method stats - 0 and 1 respectively
-        self._stats_section = self._soup.find_all(
-            "div", class_="c-stat-3bar c-stat-3bar--no-chart"
-        )
-
-        # Striking and Grappling stats - 0 and 1 respectively
-        self._stats_targets = self._soup.find_all(
-            "div", class_="stats-records stats-records--two-column"
-        )
-
-        name = self._get_name()
-        nickname = self._get_nickname()
-
-        status = self._get_status()
         ranking, pfp_ranking = self._get_ranking()
-        weight_class = self._get_weightclass()
-
         home_city, home_country = self._get_hometown()
-
-        gym = self._get_gym()
-        fighting_style = self._get_fighting_style()
-
-        record_obj = self._get_record_obj()
-
-        physical_stats_obj = self._get_physical_stats_obj()
-
-        win_method_obj = self._get_win_method_obj()
-
-        striking_obj = self._get_striking_obj()
-
-        grappling_obj = self._get_grappling_obj()
 
         fighter_data = {
             "fighter_url": self.fighter_url,
-            "name": name,
-            "nickname": nickname,
-            "status": status,
+            "name": self._get_name(),
+            "nickname": self._get_nickname(),
+            "status": self._get_status(),
             "ranking": ranking,
             "pfp_ranking": pfp_ranking,
-            "weight_class": weight_class,
+            "weight_class": self._get_weightclass(),
             "home_city": home_city,
             "home_country": home_country,
-            "gym": gym,
-            "fighting_style": fighting_style,
-            "record": record_obj,
-            "win_method": win_method_obj,
-            "physical_stats": physical_stats_obj,
-            "striking": striking_obj,
-            "grappling": grappling_obj,
+            "gym": self._get_gym(),
+            "fighting_style": self._get_fighting_style(),
+            "record": self._get_record_obj(),
+            "win_method": self._get_win_method_obj(),
+            "physical_stats": self._get_physical_stats_obj(),
+            "striking": self._get_striking_obj(),
+            "grappling": self._get_grappling_obj(),
         }
 
         fighter_obj = Fighter(**fighter_data)

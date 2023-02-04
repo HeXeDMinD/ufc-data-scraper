@@ -19,7 +19,7 @@ def _page_is_valid(soup: BeautifulSoup) -> bool:
         bool: Whether page is empty.
     """
 
-    return soup.find("h3") and True or False
+    return soup.find("h3", class_="c-card-event--result__headline") and True or False
 
 
 def get_event_urls(page_num: int) -> list[str]:
@@ -97,7 +97,7 @@ def _get_event_data(event_fmid: int) -> dict:
         f"http://d29dxerjsp82wz.cloudfront.net/api/v3/event/live/{event_fmid}.json"
     )
     site_response = requests.get(events_endpoint)
-    
+
     if site_response.status_code != 200:
         return None
 
@@ -115,16 +115,13 @@ def _get_event_date(soup: BeautifulSoup) -> str:
         >>> "Sun, Dec 18 / 2:00 AM SAST"
     """
 
-    event_start = None
-
     target = soup.select(
         "#block-mainpagecontent > div > div.c-hero > div.c-hero__container > div > div.c-hero__bottom-text > div.c-hero__headline-suffix.tz-change-inner"
     )
+    if len(target) < 1:
+        return None
 
-    if len(target) > 0:
-        event_start = target[0].get_text().strip()
-
-    return event_start
+    return target[0].get_text().strip()
 
 
 def _convert_scraped_date(date: str) -> datetime:

@@ -2,7 +2,7 @@ from dataclasses import asdict
 from json import dumps
 
 
-class Base:
+class DataModelBase:
     def as_dict(self):
         return asdict(self)
 
