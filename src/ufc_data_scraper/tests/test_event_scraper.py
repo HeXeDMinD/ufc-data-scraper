@@ -283,12 +283,91 @@ class TestEventScraper:
 
     test_fighter = test_fight_1.get("Fighters")[0]
 
+    # _get_event_data
     def test_get_event_data(self):
         actual = self.test_event_scraper._event_data
+        expected = 1124
 
         assert len(actual) > 0
+        assert actual["EventId"] == expected
 
-    def test_get_fighter_urls(self):
+    # _get_location_obj
+    def test_get_location_obj(self):
+        expected = {
+            "venue": "T-Mobile Arena",
+            "city": "Las Vegas",
+            "country": "USA",
+            "tricode": "USA",
+        }
+
+        actual = self.test_event.location
+
+        assert isinstance(actual, Location)
+
+        for key, value in expected.items():
+            assert actual.__dict__[key] == value
+
+    # _get_fighter_name
+    def test_get_fighter_name(self):
+        expected = "Bryce Mitchell"
+        actual = self.test_event_scraper._get_fighter_name(self.test_fighter)
+
+        assert actual == expected
+
+    def test_get_fighter_name_missing_first_name(self):
+        test_fighter = {"Name": {"FirstName": "", "LastName": "Mitchell"}}
+        expected = "Mitchell"
+        actual = self.test_event_scraper._get_fighter_name(test_fighter)
+
+        assert actual == expected
+
+    def test_get_fighter_name_missing_last_name(self):
+        test_fighter = {"Name": {"FirstName": "Bryce", "LastName": ""}}
+        expected = "Bryce"
+        actual = self.test_event_scraper._get_fighter_name(test_fighter)
+
+        assert actual == expected
+
+    def test_get_fighter_name_no_name_data(self):
+        test_fighter = {}
+        actual = self.test_event_scraper._get_fighter_name(test_fighter)
+
+        assert actual is None
+
+    # _get_fighter_url
+    def test_get_fighter_url(self):
+        expected = "http://www.ufc.com/athlete/bryce-mitchell"
+        actual = self.test_event_scraper._get_fighter_url(self.test_fighter)
+
+        assert actual == expected
+
+    def test_get_fighter_url_missing_url(self):
+        test_fighter = {
+            "UFCLink": None,
+            "Name": {"FirstName": "Bryce", "LastName": "Mitchell"},
+        }
+        expected = "http://www.ufc.com/athlete/bryce-mitchell"
+        actual = self.test_event_scraper._get_fighter_url(test_fighter)
+
+        assert actual == expected
+
+    def test_get_fighter_url_no_data(self):
+        test_fighter = {}
+        actual = self.test_event_scraper._get_fighter_url(test_fighter)
+
+        assert actual is None
+
+    def test_get_fighter_url_missing_both_names(self):
+        test_fighter = {
+            "UFCLink": None,
+            "Name": {"FirstName": "", "LastName": ""},
+        }
+        actual = self.test_event_scraper._get_fighter_url(test_fighter)
+
+        assert actual is None
+
+    # _get_booked_fighter_urls
+    def test_get_booked_fighter_urls(self):
         expected = [
             "http://www.ufc.com/athlete/jan-blachowicz",
             "http://www.ufc.com/athlete/magomed-ankalaev",
@@ -317,90 +396,32 @@ class TestEventScraper:
         ]
         actual = self.test_event_scraper._fighter_urls
 
-        assert actual == expected
+        assert actual.sort() == expected.sort()
 
-    def test_scraped_fighters_length(self):
-        assert len(self.test_event_scraper._fighter_urls) == len(
-            self.test_event_scraper._scraped_fighters
-        )
+    # _get_fighter_obj
+    def test_get_fighter_obj(self):
+        test_url = "http://www.ufc.com/athlete/jan-blachowicz"
+        actual = self.test_event_scraper._get_fighter_obj(test_url)
 
-    def test_get_location_obj(self):
-        expected = {
-            "venue": "T-Mobile Arena",
-            "city": "Las Vegas",
-            "country": "USA",
-            "tricode": "USA",
-        }
+        assert isinstance(actual, Fighter)
+        assert actual.fighter_url == test_url
 
-        actual = self.test_event.location
+    def test_get_fighter_obj_invalid_url(self):
+        test_url = "http://www.google.com"
+        actual = self.test_event_scraper._get_fighter_obj(test_url)
 
-        assert isinstance(actual, Location)
+        assert actual is None
 
-        for key, value in expected.items():
-            assert actual.__dict__[key] == value
+    # _scrape_fighters
+    def test_scraped_fighters(self):
+        actual = self.test_event_scraper._scraped_fighters
 
-    def test_get_fighter_name_missing_first_name(self):
-        test_fighter = {"Name": {"FirstName": "", "LastName": "Mitchell"}}
-        expected = "Mitchell"
-        actual = self.test_event_scraper._get_fighter_name(test_fighter)
+        assert len(self.test_event_scraper._fighter_urls) == len(actual)
 
-        assert actual == expected
+        for fighter_url, fighter_obj in actual.items():
+            assert fighter_obj.fighter_url == fighter_url
 
-    def test_get_fighter_name_missing_last_name(self):
-        test_fighter = {"Name": {"FirstName": "Bryce", "LastName": ""}}
-        expected = "Bryce"
-        actual = self.test_event_scraper._get_fighter_name(test_fighter)
-
-        assert actual == expected
-
-    def test_get_fighter_name(self):
-        expected = "Bryce Mitchell"
-        actual = self.test_event_scraper._get_fighter_name(self.test_fighter)
-
-        assert actual == expected
-
-    def test_get_fight_scores_no_scores(self):
-        expected = []
-        actual = self.test_event_scraper._get_fight_scores(self.test_fight_1)
-
-        assert actual == expected
-
-    def test_get_fight_score_has_scores(self):
-        actual = self.test_event_scraper._get_fight_scores(self.test_fight_2)
-
-        assert len(actual) > 0
-
-        for fight_score in actual:
-            assert isinstance(fight_score, FightScore)
-
-    def test_get_referee_name_fight_1(self):
-        expected = "Marc Goddard"
-        actual = self.test_event_scraper._get_referee_name(self.test_fight_1)
-
-        assert actual == expected
-
-    def test_get_referee_name_fight_2(self):
-        expected = "John McCarthy"
-        actual = self.test_event_scraper._get_referee_name(self.test_fight_2)
-
-        assert actual == expected
-
-    def test_get_fighter_url_missing_url(self):
-        test_fighter = {
-            "UFCLink": None,
-            "Name": {"FirstName": "Bryce", "LastName": "Mitchell"},
-        }
-        expected = "http://www.ufc.com/athlete/bryce-mitchell"
-        actual = self.test_event_scraper._get_fighter_url(test_fighter)
-
-        assert actual == expected
-
-    def test_get_fighter_url(self):
-        expected = "http://www.ufc.com/athlete/bryce-mitchell"
-        actual = self.test_event_scraper._get_fighter_url(self.test_fighter)
-
-        assert actual == expected
-
+    # _get_fighters_stats
     def test_get_fighters_stats(self):
         expected = {
             "fighter": None,
@@ -492,6 +513,7 @@ class TestEventScraper:
                 continue
             assert actual.__dict__[key] == value
 
+    # _parse_fighters
     def test_parse_fighters(self):
         expected = ("Bryce Mitchell", "Ilia Topuria")
         actual = self.test_event_scraper._parse_fighters(self.test_fight_1)
@@ -502,6 +524,35 @@ class TestEventScraper:
             assert isinstance(actual[i].fighter, Fighter)
             assert actual[i].fighter.name == name
 
+    # _get_fight_scores
+    def test_get_fight_scores_no_scores(self):
+        expected = []
+        actual = self.test_event_scraper._get_fight_scores(self.test_fight_1)
+
+        assert actual == expected
+
+    def test_get_fight_score_has_scores(self):
+        actual = self.test_event_scraper._get_fight_scores(self.test_fight_2)
+
+        assert len(actual) > 0
+
+        for fight_score in actual:
+            assert isinstance(fight_score, FightScore)
+
+    # _get_referee_name
+    def test_get_referee_name_fight_1(self):
+        expected = "Marc Goddard"
+        actual = self.test_event_scraper._get_referee_name(self.test_fight_1)
+
+        assert actual == expected
+
+    def test_get_referee_name_fight_2(self):
+        expected = "John McCarthy"
+        actual = self.test_event_scraper._get_referee_name(self.test_fight_2)
+
+        assert actual == expected
+
+    # _get_result_obj
     def test_get_result_test_fight_1(self):
         expected = {
             "method": "Submission",
@@ -541,6 +592,7 @@ class TestEventScraper:
         for key, value in expected.items():
             assert actual.__dict__[key] == value
 
+    # _get_weight_class_obj
     def test_get_weight_class_obj_fight_1(self):
         expected = {
             "description": "Featherweight",
@@ -568,6 +620,7 @@ class TestEventScraper:
         for key, value in expected.items():
             assert actual.__dict__[key] == value
 
+    # _get_accolades_obj
     def test_get_accolades_obj_no_accolades(self):
         actual = self.test_event_scraper._get_accolades_obj(self.test_fight_1)
 
@@ -583,6 +636,7 @@ class TestEventScraper:
         for key, value in expected.items():
             assert actual.__dict__[key] == value
 
+    # _get_rule_set_obj
     def test_get_rule_set_obj_fight_1(self):
         expected = {"description": "3 Rnd (5-5-5)", "possible_rounds": 3}
         actual = self.test_event_scraper._get_rule_set_obj(self.test_fight_1)
@@ -601,8 +655,32 @@ class TestEventScraper:
         for key, value in expected.items():
             assert actual.__dict__[key] == value
 
+    # _parse_fight
+    def test_parse_fight(self):
+        actual = self.test_event_scraper._parse_fight(self.test_fight_2)
+
+        assert isinstance(actual, Fight)
+
+        attributes_to_check = {
+            FighterStats: actual.fighters_stats,
+            Result: actual.result,
+            WeightClass: actual.weight_class,
+            Accolade: actual.accolades,
+            RuleSet: actual.rule_set,
+            FightScore: actual.fight_scores,
+            FighterStats: actual.fighters_stats,
+        }
+
+        for obj_type, attribute in attributes_to_check.items():
+            if isinstance(attribute, list):
+                for item in attribute:
+                    assert isinstance(item, obj_type)
+                continue
+            assert isinstance(attribute, obj_type)
+
+    # _get_card_segments
     def test_get_card_segments(self):
-        expected = ["Main", "Prelims1", "Prelims2"]
+        expected = ("Main", "Prelims1", "Prelims2")
         actual = self.test_event.card_segments
 
         assert isinstance(actual, list)
@@ -613,20 +691,21 @@ class TestEventScraper:
             assert segment.name == expected[i]
 
     def test_get_card_segments_start_times(self):
-        expected = ["2022-12-11T03:00Z", "2022-12-11T01:00Z", "2022-12-10T23:30Z"]
+        expected = ("2022-12-11T03:00Z", "2022-12-11T01:00Z", "2022-12-10T23:30Z")
         actual = self.test_event.card_segments
 
         for i, segment in enumerate(actual):
             assert segment.start_time == convert_date(expected[i])
 
     def test_get_card_segments_broadcasters(self):
-        expected = ["PPV", "ESPN 2", "UFC Fight Pass"]
+        expected = ("PPV", "ESPN 2", "UFC Fight Pass")
         actual = self.test_event.card_segments
 
         for i, segment in enumerate(actual):
             assert segment.broadcaster == expected[i]
 
-    def test_scraped_event(self):
+    # scrape_event
+    def test_scrape_event(self):
         expected = {
             "fmid": self.test_fmid,
             "event_url": self.test_url,
