@@ -2,9 +2,10 @@ from datetime import datetime
 
 from dataclasses import dataclass
 
-from ufc_data_scraper.data_models.event.location import Location
 from ufc_data_scraper.data_models.base import DataModelBase
 
+from ufc_data_scraper.data_models.event.location import Location
+from ufc_data_scraper.data_models.event.card_segment import CardSegment
 
 @dataclass(frozen=True, order=True)
 class Event(DataModelBase):
@@ -14,4 +15,4 @@ class Event(DataModelBase):
     date: datetime
     status: str
     location: Location
-    card_segments: list
+    card_segments: list[CardSegment]

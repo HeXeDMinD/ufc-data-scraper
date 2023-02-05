@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from ufc_data_scraper.data_models.fighter.fighter import Fighter
 from ufc_data_scraper.data_models.base import DataModelBase
+
+from ufc_data_scraper.data_models.fighter import Fighter
 
 
 @dataclass(frozen=True, order=True)
