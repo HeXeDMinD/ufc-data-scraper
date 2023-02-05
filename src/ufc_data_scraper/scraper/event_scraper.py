@@ -42,7 +42,65 @@ class EventScraper:
 
         return event_response.json().get("LiveEventDetail")
 
-    def _get_fighter_urls(self) -> list[str]:
+    def _get_location_obj(self) -> Location:
+        """Get location data from event data and return it as a Location object.
+
+        Returns:
+            Location: Location object containing location data.
+        """
+
+        location_data = self._event_data.get("Location")
+
+        keys = ["Venue", "City", "Country", "TriCode"]
+        location_data = {key.lower(): location_data[key] or "TBD" for key in keys}
+
+        return Location(**location_data)
+
+    # <-- Fighter Related
+    def _get_fighter_name(self, fighter: dict) -> str:
+        """Get fighter name from fighter dictionary and return it as a string.
+
+        Args:
+            fighter (dict): Fighter dictionary from event data.
+
+        Returns:
+            str: Fighter's full name as a string.
+        """
+
+        name_data = fighter.get("Name")
+        if not name_data:
+            return None
+
+        first_name = name_data.get("FirstName")
+        last_name = name_data.get("LastName")
+        if not first_name and not last_name:
+            return None
+
+        return f"{first_name} {last_name}".strip()
+
+    def _get_fighter_url(self, fighter: dict) -> str:
+        """Get fighter url from event data or approximate it using their name if none is listed.
+
+        Args:
+            fighter (dict): Fighter dictionary from event data.
+
+        Returns:
+            str: Fighters ufc page url.
+        """
+
+        fighter_url = fighter.get("UFCLink")
+
+        if not fighter_url:
+            fighter_name = self._get_fighter_name(fighter)
+            if not fighter_name:
+                return None
+
+            fighter_name = fighter_name.replace(" ", "-")
+            fighter_url = f"https://www.ufc.com/athlete/{fighter_name}"
+
+        return set_fighter_url(fighter_url, self._incorrect_fighter_urls)
+
+    def _get_booked_fighter_urls(self) -> list[str]:
         """Gets fighter urls from event data.
 
         Returns:
@@ -50,13 +108,30 @@ class EventScraper:
         """
 
         fighter_urls = []
-
         for fight in self._event_data.get("FightCard"):
             for fighter in fight.get("Fighters"):
-                url = self._get_fighter_url(fighter)
-                fighter_urls.append(url)
+                fighter_url = self._get_fighter_url(fighter)
+                fighter_urls.append(fighter_url)
 
         return fighter_urls
+
+    def _get_fighter_obj(self, fighter_url: str) -> Fighter:
+        """Scrapes fighter data from fighter url and returns it as a Fighter object.
+
+        Args:
+            fighter_url (str): Fighters ufc page url.
+
+        Returns:
+            Fighter: Fighter object containing fighter's data.
+        """
+
+        try:
+            figher_scraper = FighterScraper(fighter_url, self._incorrect_fighter_urls)
+            fighter = figher_scraper.scrape_fighter()
+        except requests.exceptions.HTTPError:
+            fighter = None
+
+        return fighter
 
     def _scrape_fighters(self) -> dict[str, Fighter]:
         """Scrapes fighters and returns them in a dictionary.
@@ -77,118 +152,6 @@ class EventScraper:
         fighters = [future.result() for future in futures]
 
         return dict(zip(self._fighter_urls, fighters))
-
-    def _get_location_obj(self) -> Location:
-        """Get location data from event data and return it as a Location object.
-
-        Returns:
-            Location: Location object containing location data.
-        """
-
-        location_data = self._event_data.get("Location")
-
-        keys = ["Venue", "City", "Country", "TriCode"]
-        location_data = {key.lower(): location_data[key] or "TBD" for key in keys}
-
-        return Location(**location_data)
-
-    def _get_fighter_name(self, fighter: dict) -> str:
-        """Get fighter name from fighter dictionary and return it as a string.
-
-        Args:
-            fighter (dict): Fighter dictionary from event data.
-
-        Returns:
-            str: Fighter's full name as a string.
-        """
-
-        name_data = fighter.get("Name")
-
-        return f"{name_data.get('FirstName')} {name_data.get('LastName')}".strip()
-
-    def _get_fight_scores(self, fight: dict) -> list[FightScore]:
-        """Get fight score information from fight dictionary convert each into a FightScore object and return them as a list.
-
-        Args:
-            fight (dict): Fight dictionary from event data.
-
-        Returns:
-            list[FightScore]: List of FightScore objects.
-        """
-
-        fight_results = fight.get("Result")
-
-        fight_scores = []
-
-        for score in fight_results.get("FightScores"):
-            judge_name = f"{score.get('JudgeFirstName')} {score.get('JudgeLastName')}"
-            score_red = score.get("Fighters")[0].get("Score")
-            score_blue = score.get("Fighters")[1].get("Score")
-
-            fight_score = FightScore(judge_name, score_red, score_blue)
-
-            fight_scores.append(fight_score)
-
-        return fight_scores
-
-    def _get_referee_name(self, fight: dict) -> str:
-        """Get referee name from fight dictionary and return it as a string.
-
-        Args:
-            fight (dict): Fight dictionary from event data.
-
-        Returns:
-            str: Referee's full name as a string.
-        """
-
-        referee_name = ""
-
-        referee = fight.get("Referee")
-        if referee.get("FirstName"):
-            referee_name = f"{referee.get('FirstName')} {referee.get('LastName')}"
-
-        return referee_name
-
-    def _get_fighter_url(self, fighter: dict) -> str:
-        """Get fighter url from event data or approximate it using their name if none is listed.
-
-        Args:
-            fighter (dict): Fighter dictionary from event data.
-
-        Returns:
-            str: Fighters ufc page url.
-        """
-
-        fighter_url = fighter.get("UFCLink")
-
-        if not fighter_url:
-            fighter_name = self._get_fighter_name(fighter)
-            if not fighter_name:
-                return None
-
-            fighter_url = (
-                f"https://www.ufc.com/athlete/{fighter_name.replace(' ', '-')}"
-            )
-
-        return set_fighter_url(fighter_url, self._incorrect_fighter_urls)
-
-    def _get_fighter_obj(self, fighter_url: str) -> Fighter:
-        """Scrapes fighter data from fighter url and returns it as a Fighter object.
-
-        Args:
-            fighter_url (str): Fighters ufc page url.
-
-        Returns:
-            Fighter: Fighter object containing fighter's data.
-        """
-
-        try:
-            figher_scraper = FighterScraper(fighter_url, self._incorrect_fighter_urls)
-            fighter = figher_scraper.scrape_fighter()
-        except requests.exceptions.HTTPError:
-            fighter = None
-
-        return fighter
 
     def _get_fighters_stats(self, fighter: dict) -> FighterStats:
         """Get fighter stats from fighter dictionary and return it as a FighterStats object.
@@ -232,7 +195,56 @@ class EventScraper:
             list[FighterStats]: List of FighterStats objects.
         """
 
-        return [self._get_fighters_stats(fighter) for fighter in fight.get("Fighters")]
+        fighter_stats = [
+            self._get_fighters_stats(fighter) for fighter in fight.get("Fighters")
+        ]
+
+        return fighter_stats
+
+    # Fighter Related -->
+
+    def _get_fight_scores(self, fight: dict) -> list[FightScore]:
+        """Get fight score information from fight dictionary convert each into a FightScore object and return them as a list.
+
+        Args:
+            fight (dict): Fight dictionary from event data.
+
+        Returns:
+            list[FightScore]: List of FightScore objects.
+        """
+
+        fight_results = fight.get("Result")
+
+        fight_scores = []
+
+        for score in fight_results.get("FightScores"):
+            judge_name = f"{score.get('JudgeFirstName')} {score.get('JudgeLastName')}"
+            score_red = score.get("Fighters")[0].get("Score")
+            score_blue = score.get("Fighters")[1].get("Score")
+
+            fight_score = FightScore(judge_name, score_red, score_blue)
+
+            fight_scores.append(fight_score)
+
+        return fight_scores
+
+    def _get_referee_name(self, fight: dict) -> str:
+        """Get referee name from fight dictionary and return it as a string.
+
+        Args:
+            fight (dict): Fight dictionary from event data.
+
+        Returns:
+            str: Referee's full name as a string.
+        """
+
+        referee_name = ""
+
+        referee = fight.get("Referee")
+        if referee.get("FirstName"):
+            referee_name = f"{referee.get('FirstName')} {referee.get('LastName')}"
+
+        return referee_name
 
     def _get_result_obj(self, fight: dict) -> Result:
         """Get result information from fight dictionary and return it as a Result object.
@@ -414,7 +426,7 @@ class EventScraper:
             raise Exception("Could not retrieve event data.")
 
         self._incorrect_fighter_urls = get_incorrect_urls()
-        self._fighter_urls = self._get_fighter_urls()
+        self._fighter_urls = self._get_booked_fighter_urls()
         self._scraped_fighters = self._scrape_fighters()
 
         event_date = self._event_data.get("StartTime")
