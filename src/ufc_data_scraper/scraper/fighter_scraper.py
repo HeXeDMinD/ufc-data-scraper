@@ -289,7 +289,7 @@ class FighterScraper:
                 if "weight" in target_text:
                     return target_text
 
-        return "None"
+        return "Unlisted"
 
     def _get_hometown(self) -> tuple:
         """Gets fighter's home city and country. Returns them as a tuple of str values.

@@ -553,16 +553,28 @@ class TestFighterScraper:
         test_data = '<p class="hero-profile__division-title"></p>'
         self.test_fighter_scraper._create_soup(test_data)
 
-        expected = "None"
+        expected = "Unlisted"
         actual = self.test_fighter_scraper._get_weightclass()
 
         assert actual == expected
+        
+    def test_get_weightclass_raw_empty_main_target_and_empty_fallback(self):
+        test_data = """
+            <p class="hero-profile__tag"></p>
+            <p class="hero-profile__division-title"></p>
+        """
+        self.test_fighter_scraper._create_soup(test_data)
 
-    def test_get_weightclass_raw_no_target(self):
+        expected = "Unlisted"
+        actual = self.test_fighter_scraper._get_weightclass()
+
+        assert actual == expected
+        
+    def test_get_weightclass_raw_no_targets(self):
         test_data = ""
         self.test_fighter_scraper._create_soup(test_data)
 
-        expected = "None"
+        expected = "Unlisted"
         actual = self.test_fighter_scraper._get_weightclass()
 
         assert actual == expected
