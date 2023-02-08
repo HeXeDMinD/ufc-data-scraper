@@ -278,6 +278,17 @@ class FighterScraper:
             if target_text:
                 return target_text
 
+        # Fallback to checking profile "pills" if weightclass section is missing
+        targets = self._soup.find_all("p", class_="hero-profile__tag")
+        if targets:
+            for target in targets:
+                target_text = target.get_text().strip()
+                if not target_text:
+                    continue
+
+                if "weight" in target_text:
+                    return target_text
+
         return "None"
 
     def _get_hometown(self) -> tuple:

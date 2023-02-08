@@ -537,7 +537,19 @@ class TestFighterScraper:
 
         assert actual == expected
 
-    def test_get_weightclass_raw_empty_target(self):
+    def test_get_weightclass_raw_empty_main_target(self):
+        test_data = """
+            <p class="hero-profile__tag">Featherweight Division</p>
+            <p class="hero-profile__division-title"></p>
+        """
+        self.test_fighter_scraper._create_soup(test_data)
+
+        expected = "Featherweight Division"
+        actual = self.test_fighter_scraper._get_weightclass()
+
+        assert actual == expected
+
+    def test_get_weightclass_raw_empty__main_target_no_fallback(self):
         test_data = '<p class="hero-profile__division-title"></p>'
         self.test_fighter_scraper._create_soup(test_data)
 

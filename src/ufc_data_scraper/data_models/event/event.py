@@ -7,6 +7,7 @@ from ufc_data_scraper.data_models.base import DataModelBase
 from ufc_data_scraper.data_models.event.location import Location
 from ufc_data_scraper.data_models.event.card_segment import CardSegment
 
+
 @dataclass(frozen=True, order=True)
 class Event(DataModelBase):
     fmid: int
