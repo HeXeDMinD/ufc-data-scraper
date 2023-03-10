@@ -40,7 +40,7 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
 
 class FighterScraper:
     def __init__(
-        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls()
+        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls(),  incorrect_names=utils.get_incorrect_names()
     ) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
@@ -53,6 +53,7 @@ class FighterScraper:
         """
 
         self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
+        self._incorrect_names = incorrect_names
         self._soup = None
         self._stats_section = None
         self._stats_targets = None
@@ -194,6 +195,11 @@ class FighterScraper:
 
         name = name.replace("-", " ")
 
+        try:
+            name = self._incorrect_names[name]
+        except (KeyError, TypeError):
+            name = name
+            
         return unidecode(name.strip())
 
     def _get_nickname(self) -> str:

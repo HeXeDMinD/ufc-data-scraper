@@ -37,3 +37,19 @@ def get_incorrect_urls() -> dict[str, str]:
         return None
 
     return site_response.json()
+
+def get_incorrect_names() -> dict[str, str]:
+    """Grabs latest incorrect names from github file.
+
+    Returns:
+        dict: Dictionary of incorrect fighter names with their correct counterpart.
+    """
+
+    data_url = "https://raw.githubusercontent.com/HeXeDMinD/ufc-data-scraper/main/src/ufc_data_scraper/data/incorrect_names.json"
+
+    site_response = requests.get(data_url)
+
+    if site_response.status_code != 200:
+        return None
+
+    return site_response.json()
