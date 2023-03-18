@@ -1,9 +1,13 @@
+from datetime import datetime
+
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper, set_fighter_url
 
 from ufc_data_scraper.utils import get_incorrect_urls
 
 from ufc_data_scraper.data_models.fighter import *
 
+def _fighters_actual_age(birth_year: int):
+    return datetime.now().year - birth_year
 
 class TestFighterScraper:
     incorrect_fighter_urls = get_incorrect_urls()
@@ -12,6 +16,8 @@ class TestFighterScraper:
         "https://www.ufc.com/athlete/ali-alqaisi", incorrect_fighter_urls
     )
     test_fighter = scraper_ali_alqaisi.scrape_fighter()
+    test_fighter_age = _fighters_actual_age(1991)
+
     # Contains some data missing from scraper_ali_alqaisi
     scraper_joseph_benavidez = FighterScraper(
         "https://www.ufc.com/athlete/joseph-benavidez", incorrect_fighter_urls
@@ -1065,7 +1071,7 @@ class TestFighterScraper:
     # _get_physical_stats
     def test_get_physical_stats_webpage(self):
         expected = {
-            "age": 31,
+            "age": self.test_fighter_age,
             "height": 68.0,
             "weight": 136.0,
             "reach": 68.0,
@@ -1318,7 +1324,7 @@ class TestFighterScraper:
 
     def test_get_physical_stats_obj(self):
         expected = {
-            "age": 31,
+            "age": self.test_fighter_age,
             "height": 68.00,
             "weight": 136.00,
             "reach": 68.00,
