@@ -6,6 +6,8 @@ import pytz
 from bs4 import BeautifulSoup, SoupStrainer
 from datetime import datetime, timedelta
 
+from ufc_data_scraper.exceptions import InvalidEventUrl, MissingEventFMID
+
 from ufc_data_scraper.utils import convert_date
 
 
@@ -244,10 +246,10 @@ def get_event_fmid(event_url: str) -> int:
     site_response.raise_for_status()
 
     if not _valid_event_page(site_response.content):
-        raise Exception("Url is not a valid event url.")
+        raise InvalidEventUrl
 
     fmid = _scrape_event_fmid(site_response) or _brute_force_event_fmid(site_response)
     if not fmid:
-        raise Exception(f"FMID could not be found for {event_url}")
+        raise MissingEventFMID(f"FMID could not be found for {event_url}")
 
     return fmid

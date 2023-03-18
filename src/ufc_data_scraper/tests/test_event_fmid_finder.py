@@ -6,6 +6,8 @@ import pytz
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
+from ufc_data_scraper.exceptions import InvalidEventUrl
+
 from ufc_data_scraper.scraper.fmid_finder import (
     _page_has_event_links,
     _valid_event_page,
@@ -183,5 +185,5 @@ class TestEventFmidFinder:
     def test_get_event_fmid_not_valid_event_url(self):
         test_url = "https://www.google.com"
 
-        with pytest.raises(Exception, match=r"Url is not a valid event url."):
+        with pytest.raises(InvalidEventUrl, match=r"Url is not a valid event url."):
             get_event_fmid(test_url)

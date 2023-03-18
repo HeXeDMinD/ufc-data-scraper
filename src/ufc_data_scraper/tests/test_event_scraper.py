@@ -2,6 +2,8 @@ import pytest
 
 from ufc_data_scraper.scraper import EventScraper
 
+from ufc_data_scraper.exceptions import MissingEventData
+
 from ufc_data_scraper.data_models.event import *
 from ufc_data_scraper.data_models.fighter import Fighter
 
@@ -726,5 +728,5 @@ class TestEventScraper:
 
         test_event_scraper = EventScraper(invalid_fmid, invalid_url)
 
-        with pytest.raises(Exception, match=r"Could not retrieve event data."):
+        with pytest.raises(MissingEventData, match=r"Could not retrieve event data."):
             test_event_scraper.scrape_event()

@@ -3,6 +3,8 @@ import concurrent.futures
 
 from ufc_data_scraper.scraper.fighter_scraper import FighterScraper, set_fighter_url
 
+from ufc_data_scraper.exceptions import MissingEventData
+
 from ufc_data_scraper.data_models.event import *
 from ufc_data_scraper.data_models.fighter import Fighter
 
@@ -423,7 +425,7 @@ class EventScraper:
 
         self._event_data = self._get_event_data()
         if len(self._event_data) < 1:
-            raise Exception("Could not retrieve event data.")
+            raise MissingEventData
 
         self._incorrect_fighter_urls = get_incorrect_urls()
         self._fighter_urls = self._get_booked_fighter_urls()
