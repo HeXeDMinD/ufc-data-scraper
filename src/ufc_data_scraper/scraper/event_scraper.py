@@ -135,11 +135,11 @@ class EventScraper:
 
         return fighter
 
-    def _scrape_fighters(self) -> dict[str, Fighter]:
+    def _scrape_fighters(self) -> dict[str:Fighter]:
         """Scrapes fighters and returns them in a dictionary.
 
         Returns:
-            dict[str, Fighter]: Dictionary of Fighter objects, using fighter url as a key.
+            dict[str:Fighter]: Dictionary of Fighter objects, using fighter url as a key.
         """
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
