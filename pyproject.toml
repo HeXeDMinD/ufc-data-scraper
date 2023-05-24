@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ufc_data_scraper"
-version = "1.0.51"
+version = "1.0.52"
 authors = [
   { name="Kyle Leben", email="leben.kyle.hex@gmail.com" },
 ]

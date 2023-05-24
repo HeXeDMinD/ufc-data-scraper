@@ -19,7 +19,8 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
     Returns:
         str: Corrected fighter url.
     """
-
+    
+    fighter_url = fighter_url.replace("https", "http")
     # Remove any strange chars from fighter name
     url_name = fighter_url.split("/")[-1].lower()
 
@@ -35,7 +36,6 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
     except (KeyError, TypeError):
         fighter_url = fighter_url
 
-    fighter_url = fighter_url.replace("https", "http")
     
     return fighter_url
 
