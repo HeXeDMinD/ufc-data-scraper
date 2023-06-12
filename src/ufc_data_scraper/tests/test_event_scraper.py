@@ -682,7 +682,7 @@ class TestEventScraper:
 
     # _get_card_segments
     def test_get_card_segments(self):
-        expected = ("Main", "Prelims1", "Prelims2")
+        expected = ("Main", "Prelims", "Early Prelims")
         actual = self.test_event.card_segments
 
         assert isinstance(actual, list)

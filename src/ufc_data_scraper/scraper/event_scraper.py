@@ -394,11 +394,21 @@ class EventScraper:
             list[CardSegment]: List of card segments.
         """
 
+        card_segment_names = {
+            "Main": "Main",
+            "Prelims1": "Prelims",
+            "Prelims2": "Early Prelims"
+        }
+        
         fight_card = self._event_data.get("FightCard")
 
         card_segments = {}
         for fight in fight_card:
-            name = fight.get("CardSegment") or "Main"
+            try:
+                name = card_segment_names[fight.get("CardSegment")]
+            except KeyError:
+                name = "Main"
+                
             start_time = fight.get("CardSegmentStartTime") or self._event_data.get(
                 "StartTime"
             )
