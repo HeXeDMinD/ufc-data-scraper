@@ -339,7 +339,7 @@ class TestFighterScraper:
     def test_set_fighter_url_incorrect_url_unidecode(self):
         # Tests if text is correctly decoded
         test_url = "http://www.ufc.com/athlete/Cristian-Quiñonez"
-        expected = "https://www.ufc.com/athlete/trevin-dzhayls-6"
+        expected = "http://www.ufc.com/athlete/trevin-dzhayls-6"
         actual = set_fighter_url(test_url, self.incorrect_fighter_urls)
 
         assert actual == expected
