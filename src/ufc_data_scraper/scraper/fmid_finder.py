@@ -90,19 +90,32 @@ def _get_last_fmid() -> int:
     """
 
     recent_events = get_event_urls(page_num=0)
+    next_upcoming_event = recent_events[9]
+    
+    return _scrape_event_fmid(requests.get(next_upcoming_event))
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-        futures = [
-            executor.submit(
-                _scrape_event_fmid,
-                requests.get(event_url),
-            )
-            for event_url in recent_events
-        ]
 
-    event_fmids = [future.result() for future in futures if future.result()]
+# def _get_last_fmid() -> int:
+#     """Returns last available fmid from UFC events page.
 
-    return max(event_fmids)
+#     Returns:
+#         int: Latest FMID from queried event urls.
+#     """
+
+#     recent_events = get_event_urls(page_num=0)
+
+#     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+#         futures = [
+#             executor.submit(
+#                 _scrape_event_fmid,
+#                 requests.get(event_url),
+#             )
+#             for event_url in recent_events
+#         ]
+
+#     event_fmids = [future.result() for future in futures if future.result()]
+
+#     return max(event_fmids)
 
 
 def _get_event_data(event_fmid: int) -> dict:
@@ -212,7 +225,7 @@ def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
         int: Event FMID, can be used as API query or None if it cannot be acquired.
     """
 
-    current_fmid = _get_last_fmid() - 10
+    current_fmid = _get_last_fmid()
 
     while True:
         data = _get_event_data(current_fmid)
