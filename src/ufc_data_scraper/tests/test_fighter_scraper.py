@@ -6,8 +6,10 @@ from ufc_data_scraper.utils import get_incorrect_urls
 
 from ufc_data_scraper.data_models.fighter import *
 
+
 def _fighters_actual_age(birth_year: int):
     return datetime.now().year - birth_year
+
 
 class TestFighterScraper:
     incorrect_fighter_urls = get_incorrect_urls()
@@ -305,8 +307,7 @@ class TestFighterScraper:
 
         assert actual == expected
 
-    set_fighter_url
-
+    # set_fighter_url
     def test_set_fighter_url_lower_case(self):
         test_url = "http://www.ufc.com/athlete/Jan-Blachowicz"
         expected = "http://www.ufc.com/athlete/jan-blachowicz"
@@ -563,7 +564,7 @@ class TestFighterScraper:
         actual = self.test_fighter_scraper._get_weightclass()
 
         assert actual == expected
-        
+
     def test_get_weightclass_raw_empty_main_target_and_empty_fallback(self):
         test_data = """
             <p class="hero-profile__tag"></p>
@@ -575,7 +576,7 @@ class TestFighterScraper:
         actual = self.test_fighter_scraper._get_weightclass()
 
         assert actual == expected
-        
+
     def test_get_weightclass_raw_no_targets(self):
         test_data = ""
         self.test_fighter_scraper._create_soup(test_data)

@@ -4,7 +4,7 @@ import requests
 from datetime import datetime
 
 
-def convert_date(date: str) -> datetime:
+def convert_date(date: str) -> datetime | None:
     """Converts API response date into usable format.
 
     Args:
@@ -22,8 +22,8 @@ def convert_date(date: str) -> datetime:
     return pytz.timezone("GMT").localize(date_obj)
 
 
-def get_incorrect_urls() -> dict:
-    """Grabs latest incorrect urls from github file.
+def get_incorrect_urls() -> dict | None:
+    """Retrieves the latest incorrect urls from GitHub file.
 
     Returns:
         dict: Dictionary of incorrect fighter urls with their correct counterpart.
@@ -38,8 +38,9 @@ def get_incorrect_urls() -> dict:
 
     return site_response.json()
 
-def get_incorrect_names() -> dict:
-    """Grabs latest incorrect names from github file.
+
+def get_incorrect_names() -> dict | None:
+    """Retrieves the latest incorrect names from GitHub file.
 
     Returns:
         dict: Dictionary of incorrect fighter names with their correct counterpart.

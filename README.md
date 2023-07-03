@@ -94,10 +94,8 @@ or convert that Event or any other related dataclass into a json using as_json m
 -  **name**  *- (str)* Full name.
 -  **nickname**  *- (str)* Nickname.
 -  **status**  *- (str)* Current status. i.e "Active"
--  **ranking**  *- (str)* Ranking in their respective 
--  **weight** class. i.e "#1" or "Title Holder"
--  **pfp_ranking**  *- (str)* Ranking in pound for pound 
--  **rankings**. i.e "#13 PFP" or "Unranked"
+-  **ranking**  *- (str)* Ranking in their respective weight class. i.e "#1" or "Title Holder"
+-  **pfp_ranking**  *- (str)* Ranking in pound for pound rankings. i.e "#13 PFP" or "Unranked"
 -  **weight_class**  *- (str)* Current fighting weight class. i.e "Light Heavyweight Division"
 -  **home_city**  *- (str)* City the fighter currently fights out of.
 -  **home_country**  *- (str)* Country the fighter was born in.
@@ -129,7 +127,7 @@ or convert that Event or any other related dataclass into a json using as_json m
 ### PhysicalStats
 -  **age**  *- (int)* Current age.
 -  **height**  *- (float)* Height in inches.
--  **weight**  *- (float)* Last weight in weight in pounds. i.e "205.50"
+-  **weight**  *- (float)* Last weigh in weight in pounds. i.e "205.50"
 -  **reach**  *- (float)* Reach in inches.
 -  **leg_reach**  *- (float)* Leg reach in inches.
 

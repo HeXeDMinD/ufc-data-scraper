@@ -11,11 +11,11 @@ from ufc_data_scraper.exceptions import InvalidEventUrl, MissingEventFMID
 from ufc_data_scraper.utils import convert_date
 
 
-def _page_has_event_links(site_content: str) -> bool:
+def _page_has_event_links(site_content: bytes) -> bool:
     """Checks if page has event links.
 
     Args:
-        site_content (str): Site raw response content.
+        site_content (bytes): Site raw response content.
 
     Returns:
         bool: Whether page has event links.
@@ -26,11 +26,11 @@ def _page_has_event_links(site_content: str) -> bool:
     return soup.find("h3", class_="c-card-event--result__headline") and True or False
 
 
-def _valid_event_page(site_content: str) -> bool:
+def _valid_event_page(site_content: bytes) -> bool:
     """Checks if page is a valid event page.
 
     Args:
-        site_content (str): Site raw response content.
+        site_content (bytes): Site raw response content.
 
     Returns:
         bool: Whether page is a valid event page.
@@ -45,7 +45,7 @@ def _valid_event_page(site_content: str) -> bool:
     )
 
 
-def get_event_urls(page_num: int) -> list[str]:
+def get_event_urls(page_num: int) -> list[str] | None:
     """Queries events with page_num and adds event urls to list.
 
     Args:
@@ -91,7 +91,7 @@ def _get_last_fmid() -> int:
 
     recent_events = get_event_urls(page_num=0)
     next_upcoming_event = recent_events[9]
-    
+
     return _scrape_event_fmid(requests.get(next_upcoming_event))
 
 
@@ -118,7 +118,7 @@ def _get_last_fmid() -> int:
 #     return max(event_fmids)
 
 
-def _get_event_data(event_fmid: int) -> dict:
+def _get_event_data(event_fmid: int) -> dict | None:
     """Queries private API and returns json data in dict format.
 
     Args:
@@ -139,7 +139,7 @@ def _get_event_data(event_fmid: int) -> dict:
     return site_response.json().get("LiveEventDetail")
 
 
-def _get_event_date(soup: BeautifulSoup) -> str:
+def _get_event_date(soup: BeautifulSoup) -> str | None:
     """Returns event date.
 
     Args:
@@ -215,7 +215,7 @@ def _scrape_event_fmid(site_response: requests.models.Response) -> int:
     return fmid
 
 
-def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
+def _brute_force_event_fmid(site_response: requests.models.Response) -> int | None:
     """Attempt to brute force guess the event fmid if it is not available from the event url.
 
     Args:
@@ -243,11 +243,11 @@ def _brute_force_event_fmid(site_response: requests.models.Response) -> int:
                 return current_fmid
 
         current_fmid += 1
-
+        print(current_fmid)
     return None
 
 
-def get_event_fmid(event_url: str) -> int:
+def get_event_fmid(event_url: str) -> int | None:
     """Gets event fmids from url, fmid can be used as API query.
 
     Returns:

@@ -101,7 +101,7 @@ class TestEventFmidFinder:
         assert actual is None
 
     def test_get_last_fmid(self):
-        # test whether function actually returns an fmid.
+        # test whether function actually returns a fmid.
         actual = _get_last_fmid()
 
         assert isinstance(actual, int)
@@ -169,7 +169,8 @@ class TestEventFmidFinder:
 
     def test_brute_force_event_fmid(self):
         event_urls = get_event_urls(page_num=0)
-        test_url = event_urls[0]
+        # 8th event url should be the last listed upcoming event.
+        test_url = event_urls[7]
 
         actual = _brute_force_event_fmid(requests.get(test_url))
 

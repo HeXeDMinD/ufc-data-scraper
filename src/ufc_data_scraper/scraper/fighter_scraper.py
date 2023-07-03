@@ -10,7 +10,7 @@ from ufc_data_scraper.data_models.fighter import *
 
 
 def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
-    """Replaces incorrect urls and removes inconsistancies from url.
+    """Replaces incorrect urls and removes inconsistencies from url.
 
     Args:
         fighter_url (str): UFC fighter page url.
@@ -19,7 +19,7 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
     Returns:
         str: Corrected fighter url.
     """
-    
+
     fighter_url = fighter_url.replace("https", "http")
     # Remove any strange chars from fighter name
     url_name = fighter_url.split("/")[-1].lower()
@@ -36,19 +36,22 @@ def set_fighter_url(fighter_url: str, incorrect_urls: dict) -> str:
     except (KeyError, TypeError):
         fighter_url = fighter_url
 
-    
     return fighter_url
 
 
 class FighterScraper:
     def __init__(
-        self, fighter_url: str, incorrect_urls=utils.get_incorrect_urls(),  incorrect_names=utils.get_incorrect_names()
+        self,
+        fighter_url: str,
+        incorrect_urls=utils.get_incorrect_urls(),
+        incorrect_names=utils.get_incorrect_names(),
     ) -> None:
         """Scrapes ufc fighter page and returns data as a Fighter object.
 
         Args:
             fighter_url (url): UFC fighter page url.
-            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart. If supplied the scraper won't request it from web app.
+            incorrect_urls (dict, optional): Dictionary of incorrect fighter urls and their correct counterpart.
+            If supplied the scraper won't retrieve them, can speed up scraping multiple fighters.
 
         >>> fighter_scraper = FighterScraper(fighter_url)
         >>> fighter = fighter_scraper.scrape_fighter()
@@ -60,11 +63,11 @@ class FighterScraper:
         self._stats_section = None
         self._stats_targets = None
 
-    def _create_soup(self, content: str) -> None:
+    def _create_soup(self, content: bytes) -> None:
         """Creates Beautiful soup object from provided content and assigns it to _soup.
 
         Args:
-            content (str): Content to create soup from.
+            content (bytes): Content to create soup from.
         """
 
         self._soup = BeautifulSoup(content, "html.parser")
@@ -79,8 +82,8 @@ class FighterScraper:
             "div", class_="stats-records stats-records--two-column"
         )
 
-    def _parse_stat_block(self, target: Tag) -> tuple:
-        """Parses stat block for striking and takedown stats, gets accuracy, landed and attempted information. Returns them as a tuple of int values.
+    def _parse_stat_block(self, target: Tag) -> tuple[int, int, int]:
+        """Parses stat block for striking and takedown stats, gets accuracy, landed and attempted information.
 
         Args:
             target (Tag): Tag containing desired stats.
@@ -111,14 +114,16 @@ class FighterScraper:
 
         return tuple(stats)
 
-    def _parse_stats_section(self, target: Tag) -> tuple[tuple[int, int]]:
-        """Parses stats section for strike position and win method information. Returns them as a a tuple of tuples.
+    def _parse_stats_section(
+        self, target: Tag
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+        """Parses stats section for strike position and win method information.
 
         Args:
             target (Tag): Tag containing desired information.
 
         Return
-            tuple: Tuple of tuples containing value and percentage as ints.
+            tuple: Tuple containing tuples of target's value and percentage as ints.
         """
 
         tags = target.find_all("div", class_="c-stat-3bar__group")
@@ -149,7 +154,7 @@ class FighterScraper:
 
         Args:
             result_set (ResultSet): ResultSet object containing fighters striking and grappling information.
-            dict_keys (list[str]): List of dicionary keys to find within result_set.
+            dict_keys (list[str]): List of dictionary keys to find within result_set.
 
         Returns:
             dict: Dictionary of requested information from ResultSet.
@@ -201,7 +206,7 @@ class FighterScraper:
             name = self._incorrect_names[name]
         except (KeyError, TypeError):
             name = name
-            
+
         return unidecode(name.strip())
 
     def _get_nickname(self) -> str:
@@ -240,8 +245,8 @@ class FighterScraper:
 
         return status
 
-    def _get_ranking(self) -> tuple:
-        """Gets fighter's division and pound for pound ranking. Returns them as a tuple of str values.
+    def _get_ranking(self) -> tuple[str, str]:
+        """Gets fighter's division and pound for pound ranking.
 
         Returns:
             tuple: (ranking, pfp_ranking)
@@ -274,7 +279,7 @@ class FighterScraper:
         return ranking, pfp_ranking
 
     def _get_weightclass(self) -> str:
-        """Gets fighter's weightclass.
+        """Gets fighter's weight class.
 
         Returns:
             str: Weight class.
@@ -286,7 +291,7 @@ class FighterScraper:
             if target_text:
                 return target_text
 
-        # Fallback to checking profile "pills" if weightclass section is missing
+        # Fallback to checking profile "pills" if weight class section is missing
         targets = self._soup.find_all("p", class_="hero-profile__tag")
         if targets:
             for target in targets:
@@ -299,8 +304,8 @@ class FighterScraper:
 
         return "Unlisted"
 
-    def _get_hometown(self) -> tuple:
-        """Gets fighter's home city and country. Returns them as a tuple of str values.
+    def _get_hometown(self) -> tuple[str, str]:
+        """Gets fighter's home city and country.
 
         Returns:
             tuple: (city, country)
@@ -410,15 +415,18 @@ class FighterScraper:
 
         return average_fight_time
 
-    def _get_strike_position_stats(self) -> tuple[tuple[int, int]]:
-        """Get strike position information from fighter page and return it a tuple of tuples.
+    def _get_strike_position_stats(
+        self,
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+        """Get strike position information from fighter page.
 
         Indexes:
             0 - Standing
             1 - Clinch
             2 - Ground
+            
         Returns:
-            tuple[tuple[int, int]]: Each tuple strike position count and percentage.
+            tuple: Each tuple strike position count and percentage.
         """
 
         try:
@@ -498,7 +506,7 @@ class FighterScraper:
         return striking_stats
 
     def _get_record_stats(self) -> tuple[int, int, int]:
-        """Get record information from fighter page and returns it as a tuple.
+        """Get record information from fighter page.
 
         Returns:
             tuple: (win, loss, draw)
@@ -514,15 +522,17 @@ class FighterScraper:
         except (IndexError, AttributeError):
             return win, loss, draw
 
-    def _get_win_method_stats(self) -> tuple[tuple[int, int]]:
-        """Get win method information from fighter page and return it a tuple of tuples.
+    def _get_win_method_stats(
+        self,
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+        """Get win method information from fighter page.
 
         Indexes:
             0 - Knockout
             1 - Decision
             2 - Submission
         Returns:
-            tuple[tuple[int, int]]: Each tuple win method count and percentage.
+            tuple: Each tuple win method count and percentage.
         """
 
         try:
@@ -688,10 +698,10 @@ class FighterScraper:
         return StrikeTarget(**strike_target_stats)
 
     def _get_striking_obj(self) -> Striking:
-        """Gets fighter's striking, strike position and striking target information and returns them as a Striking object.
+        """Gets fighter's striking, strike position and striking target information.
 
         Returns:
-            Striking: Striking object containing all of the fighter's striking, strike position and striking target information.
+            Striking: Striking object containing all the fighter's striking, strike position and striking target information.
         """
 
         strike_position_obj = self._get_strike_position_obj()
@@ -717,10 +727,7 @@ class FighterScraper:
         return Grappling(**grappling_stats)
 
     def scrape_fighter(self) -> Fighter:
-        """Scrapes fighter data from fighter url and returns it as a Fighter object.
-
-        Args:
-            fighter_url (str): Fighters ufc page url.
+        """Scrapes fighter data from loaded fighter url.
 
         Returns:
             Fighter: Fighter object containing fighter's data.

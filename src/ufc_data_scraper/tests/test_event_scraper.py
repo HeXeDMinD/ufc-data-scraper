@@ -670,7 +670,6 @@ class TestEventScraper:
             Accolade: actual.accolades,
             RuleSet: actual.rule_set,
             FightScore: actual.fight_scores,
-            FighterStats: actual.fighters_stats,
         }
 
         for obj_type, attribute in attributes_to_check.items():

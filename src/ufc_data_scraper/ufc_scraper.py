@@ -12,7 +12,7 @@ def scrape_fighter_url(fighter_url: str) -> Fighter:
     >>> fighter = scrape_fighter_url("https://www.ufc.com/athlete/jan-blachowicz")
 
     Returns:
-        Fighter: Returns fighter object.
+        Fighter: Returns Fighter object.
     """
 
     fighter_scraper = FighterScraper(fighter_url)
@@ -29,7 +29,7 @@ def scrape_event_url(event_url: str) -> Event:
     >>> event = scrape_event_url("https://www.ufc.com/event/ufc-282")
 
     Returns:
-        Event: Returns event object.
+        Event: Returns Event object.
     """
 
     event_fmid = get_event_fmid(event_url)
@@ -48,7 +48,7 @@ def scrape_event_fmid(event_fmid: int) -> Event:
     >>> event = scrape_event_fmid(1124)
 
     Returns:
-        Event: Returns event object.
+        Event: Returns Event object.
     """
 
     event_scraper = EventScraper(event_fmid)
