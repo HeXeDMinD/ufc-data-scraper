@@ -169,8 +169,17 @@ class TestEventFmidFinder:
 
     def test_brute_force_event_fmid(self):
         event_urls = get_event_urls(page_num=0)
-        # 8th event url should be the last listed upcoming event.
-        test_url = event_urls[7]
+        
+        # Get most distant future event
+        try:
+            site_response = requests.get("http://www.ufc.com/events")
+            soup = BeautifulSoup(site_response.content, "html.parser")
+            recent_event_count = soup.find_all("div", class_="althelete-total")[0].text
+            recent_event_count = int(recent_event_count.split()[0]) - 1
+        except ValueError:
+            recent_event_count = 7  # 8th event url should be the last listed upcoming event.
+
+        test_url = event_urls[recent_event_count]
 
         actual = _brute_force_event_fmid(requests.get(test_url))
 
