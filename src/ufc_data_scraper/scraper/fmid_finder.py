@@ -243,7 +243,6 @@ def _brute_force_event_fmid(site_response: requests.models.Response) -> int | No
                 return current_fmid
 
         current_fmid += 1
-        print(current_fmid)
     return None
 
 

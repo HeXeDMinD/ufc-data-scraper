@@ -518,7 +518,8 @@ class FighterScraper:
 
         try:
             text = target.get_text().strip().split()[0]
-            return tuple(int(text) for text in text.split("-"))
+            record_values = [int(value) if value.isdigit() else 0 for value in text.split("-")]
+            return tuple(record_values)
         except (IndexError, AttributeError):
             return win, loss, draw
 
