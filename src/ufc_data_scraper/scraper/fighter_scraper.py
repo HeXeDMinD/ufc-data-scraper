@@ -57,11 +57,22 @@ class FighterScraper:
         >>> fighter = fighter_scraper.scrape_fighter()
         """
 
-        self.fighter_url = set_fighter_url(fighter_url, incorrect_urls)
+        self.fighter_url = fighter_url
+        self._incorrect_urls = incorrect_urls
         self._incorrect_names = incorrect_names
         self._soup = None
         self._stats_section = None
         self._stats_targets = None
+
+    def _fighter_not_found(self) -> bool:
+        target = self._soup.find("div", class_="hero-l-masthead__headline ")
+        if target:
+            target_text = target.get_text()
+
+            if target_text == "Search results":
+                return True
+        
+        return False
 
     def _create_soup(self, content: bytes) -> None:
         """Creates Beautiful soup object from provided content and assigns it to _soup.
@@ -739,6 +750,10 @@ class FighterScraper:
         url_response.raise_for_status()
 
         self._create_soup(url_response.content)
+        
+        if self._fighter_not_found():
+            self.fighter_url = set_fighter_url(self.fighter_url, self._incorrect_urls)
+            self.scrape_fighter()
 
         ranking, pfp_ranking = self._get_ranking()
         home_city, home_country = self._get_hometown()
