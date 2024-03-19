@@ -412,7 +412,7 @@ class TestEventScraper:
         test_url = "http://www.google.com"
         actual = self.test_event_scraper._get_fighter_obj(test_url)
 
-        assert actual is None
+        assert isinstance(actual, Fighter)
 
     # _scrape_fighters
     def test_scraped_fighters(self):
