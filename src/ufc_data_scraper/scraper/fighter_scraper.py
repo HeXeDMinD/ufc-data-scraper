@@ -329,7 +329,7 @@ class FighterScraper:
 
         for target in targets:
             label = target.find("div", class_="c-bio__label").get_text()
-            if label != "Hometown":
+            if label != "Place of Birth":
                 continue
 
             target_text = target.find("div", class_="c-bio__text").get_text()

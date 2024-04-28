@@ -591,7 +591,7 @@ class TestFighterScraper:
     def test_get_hometown_raw_only_country(self):
         test_data = """
             <div class="c-bio__field c-bio__field--border-bottom-small-screens">
-                <div class="c-bio__label">Hometown</div>
+                <div class="c-bio__label">Place of Birth</div>
                 <div class="c-bio__text">Mexico</div>
             </div>
         """
@@ -605,7 +605,7 @@ class TestFighterScraper:
     def test_get_hometown_raw_empty_targets(self):
         test_data = """
             <div class="c-bio__field c-bio__field--border-bottom-small-screens">
-                <div class="c-bio__label">Hometown</div>
+                <div class="c-bio__label">Place of Birth</div>
                 <div class="c-bio__text"></div>
             </div>
         """
