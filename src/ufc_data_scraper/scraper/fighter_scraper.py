@@ -65,10 +65,9 @@ class FighterScraper:
         self._stats_targets = None
 
     def _fighter_not_found(self) -> bool:
-        target = self._soup.find("div", class_="hero-l-masthead__headline ")
+        target = self._soup.find("div", class_="l-masthead__headline")
         if target:
             target_text = target.get_text()
-
             if target_text == "Search results":
                 return True
         
