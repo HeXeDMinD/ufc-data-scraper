@@ -98,9 +98,9 @@ class EventScraper:
                 return None
 
             fighter_name = fighter_name.replace(" ", "-")
-            fighter_url = f"https://www.ufc.com/athlete/{fighter_name}"
+            fighter_url = f"http://www.ufc.com/athlete/{fighter_name}"
 
-        return set_fighter_url(fighter_url, self._incorrect_fighter_urls)
+        return fighter_url
 
     def _get_booked_fighter_urls(self) -> list[str]:
         """Gets fighter urls from event data.

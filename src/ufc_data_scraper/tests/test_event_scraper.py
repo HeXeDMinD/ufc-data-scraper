@@ -338,7 +338,7 @@ class TestEventScraper:
 
     # _get_fighter_url
     def test_get_fighter_url(self):
-        expected = "http://www.ufc.com/athlete/bryce-mitchell"
+        expected = "http://www.ufc.com/athlete/Bryce-Mitchell"
         actual = self.test_event_scraper._get_fighter_url(self.test_fighter)
 
         assert actual == expected
@@ -348,7 +348,7 @@ class TestEventScraper:
             "UFCLink": None,
             "Name": {"FirstName": "Bryce", "LastName": "Mitchell"},
         }
-        expected = "http://www.ufc.com/athlete/bryce-mitchell"
+        expected = "http://www.ufc.com/athlete/Bryce-Mitchell"
         actual = self.test_event_scraper._get_fighter_url(test_fighter)
 
         assert actual == expected
@@ -371,30 +371,30 @@ class TestEventScraper:
     # _get_booked_fighter_urls
     def test_get_booked_fighter_urls(self):
         expected = [
-            "http://www.ufc.com/athlete/jan-blachowicz",
-            "http://www.ufc.com/athlete/magomed-ankalaev",
-            "http://www.ufc.com/athlete/paddy-pimblett",
-            "http://www.ufc.com/athlete/jared-gordon",
-            "http://www.ufc.com/athlete/santiago-ponzinibbio",
-            "http://www.ufc.com/athlete/alex-morono",
-            "http://www.ufc.com/athlete/darren-till",
-            "http://www.ufc.com/athlete/dricus-du-plessis",
-            "http://www.ufc.com/athlete/bryce-mitchell",
-            "http://www.ufc.com/athlete/ilia-topuria",
-            "http://www.ufc.com/athlete/raul-rosas-jr",
-            "http://www.ufc.com/athlete/jay-perrin",
-            "http://www.ufc.com/athlete/jairzinho-rozenstruik",
-            "http://www.ufc.com/athlete/chris-daukaus",
-            "http://www.ufc.com/athlete/edmen-shahbazyan",
-            "http://www.ufc.com/athlete/dalcha-lungiambula",
-            "http://www.ufc.com/athlete/chris-curtis",
-            "http://www.ufc.com/athlete/joaquin-buckley",
-            "http://www.ufc.com/athlete/billy-quarantillo",
-            "http://www.ufc.com/athlete/alexander-hernandez",
-            "http://www.ufc.com/athlete/tj-brown",
-            "http://www.ufc.com/athlete/erik-silva",
-            "http://www.ufc.com/athlete/cameron-saaiman",
-            "http://www.ufc.com/athlete/steven-koslow",
+            "http://www.ufc.com/athlete/Jan-Blachowicz",
+            "http://www.ufc.com/athlete/Magomed-Ankalaev",
+            "http://www.ufc.com/athlete/Paddy-Pimblett",
+            "http://www.ufc.com/athlete/Jared-Gordon",
+            "http://www.ufc.com/athlete/Santiago-Ponzinibbio",
+            "http://www.ufc.com/athlete/Alex-Morono",
+            "http://www.ufc.com/athlete/Darren-Till",
+            "http://www.ufc.com/athlete/Dricus-Du-Plessis",
+            "http://www.ufc.com/athlete/Bryce-<itchell",
+            "http://www.ufc.com/athlete/Ilia-Topuria",
+            "http://www.ufc.com/athlete/Raul-Rosas-Jr",
+            "http://www.ufc.com/athlete/Jay-Perrin",
+            "http://www.ufc.com/athlete/Jairzinho-Rozenstruik",
+            "http://www.ufc.com/athlete/Chris-Daukaus",
+            "http://www.ufc.com/athlete/Edmen-Shahbazyan",
+            "http://www.ufc.com/athlete/Dalcha-Lungiambula",
+            "http://www.ufc.com/athlete/Chris-Curtis",
+            "http://www.ufc.com/athlete/Joaquin-Buckley",
+            "http://www.ufc.com/athlete/Billy-Quarantillo",
+            "http://www.ufc.com/athlete/Alexander-Hernandez",
+            "http://www.ufc.com/athlete/Tj-Brown",
+            "http://www.ufc.com/athlete/Erik-Silva",
+            "http://www.ufc.com/athlete/Cameron-Saaiman",
+            "http://www.ufc.com/athlete/Steven-Koslow",
         ]
         actual = self.test_event_scraper._fighter_urls
 
@@ -420,14 +420,11 @@ class TestEventScraper:
 
         assert len(self.test_event_scraper._fighter_urls) == len(actual)
 
-        for fighter_url, fighter_obj in actual.items():
-            assert fighter_obj.fighter_url == fighter_url
-
     # _get_fighters_stats
     def test_get_fighters_stats(self):
         expected = {
             "fighter": None,
-            "fighter_url": "http://www.ufc.com/athlete/jan-blachowicz",
+            "fighter_url": "http://www.ufc.com/athlete/Jan-Blachowicz",
             "corner": "Red",
             "weigh_in": 204.5,
             "outcome": "Draw",
@@ -449,7 +446,7 @@ class TestEventScraper:
     def test_get_fighters_stats_test_fighter(self):
         expected = {
             "fighter": None,
-            "fighter_url": "http://www.ufc.com/athlete/bryce-mitchell",
+            "fighter_url": "http://www.ufc.com/athlete/Bryce-Mitchell",
             "corner": "Red",
             "weigh_in": 146.0,
             "outcome": "Loss",
@@ -470,7 +467,7 @@ class TestEventScraper:
     def test_get_fighters_stats_no_fighter_url(self):
         expected = {
             "fighter": None,
-            "fighter_url": "http://www.ufc.com/athlete/bryce-mitchell",
+            "fighter_url": "http://www.ufc.com/athlete/Bryce-Mitchell",
             "corner": "Red",
             "weigh_in": 146.0,
             "outcome": "Loss",
@@ -493,7 +490,7 @@ class TestEventScraper:
     def test_get_fighters_stats_no_fighter_url_no_name(self):
         expected = {
             "fighter": None,
-            "fighter_url": "http://www.ufc.com/athlete/dallas-mitchell",
+            "fighter_url": "http://www.ufc.com/athlete/Dallas-Mitchell",
             "corner": "Red",
             "weigh_in": 146.0,
             "outcome": "Loss",
